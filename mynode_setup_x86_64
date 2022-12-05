@@ -24,7 +24,7 @@ IS_32_BIT=0
 IS_64_BIT=0
 IS_UNKNOWN=1
 DEVICE_TYPE="unknown"
-LINUX=$(lsb_release -i | awk -F ":" '{printf tolower($2)}')
+LINUX=$(lsb_release -i | awk -F ":" '{printf tolower($2)}' | sed -e 's/^[[:space:]]*//')
 if [ $LINUX == "pop" ]; then
     LINUX="ubuntu"
 fi   
