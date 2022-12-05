@@ -17,6 +17,8 @@ else
     SERVER_IP=$1
 fi
 
+apt install lsb-release
+
 # Determine Device
 
 IS_X86=0
