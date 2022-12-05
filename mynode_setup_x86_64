@@ -150,8 +150,8 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 66F6C87B98EBCFE2   # I2
 
 # Update OS
 # Needed to accept new repos
-apt -y update 
-apt-get -y update
+apt update 
+#apt-get update
 
 # Freeze any packages we don't want to update
 if [ $IS_X86 = 1 ]; then
@@ -283,10 +283,6 @@ pip3 install --upgrade pip wheel setuptools
 pip3 install -r $TMP_INSTALL_PATH/usr/share/mynode/mynode_pip3_requirements.txt --no-cache-dir || \
     pip3 install -r $TMP_INSTALL_PATH/usr/share/mynode/mynode_pip3_requirements.txt --no-cache-dir --use-deprecated=html5lib
 
-## For RP4 32-bit, install specific grpcio version known to build (uses proper glibc for wheel)
-##if [ $IS_32_BIT = 1 ]; then
-##    pip3 install grpcio==$PYTHON_ARM32_GRPCIO_VERSION grpcio-tools==$PYTHON_ARM32_GRPCIO_VERSION
-##fi
 
 
 # Install node
@@ -300,7 +296,7 @@ fi
 mkdir -p /etc/apt/keyrings
 
 
-if [ LINUX == "Debian" ]; then
+if [ LINUX == "debian" ]; then
     curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
     echo \
       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
@@ -308,7 +304,7 @@ if [ LINUX == "Debian" ]; then
     apt-get update --allow-releaseinfo-change
     apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true
 
-elif [ LINUX == "Ubuntu" ]; then
+elif [ LINUX == "ubuntu" ]; then
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
 
     echo \
@@ -318,8 +314,8 @@ elif [ LINUX == "Ubuntu" ]; then
     apt-get update --allow-releaseinfo-change
     apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true 
 else
-    apt-get update --allow-releaseinfo-change
-    apt-get install -y docker docker-compose
+    apt update --allow-releaseinfo-change
+    apt install -y docker docker-compose
 fi
 
 # Use systemd for managing docker
