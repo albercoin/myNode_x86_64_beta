@@ -25,6 +25,9 @@ IS_64_BIT=0
 IS_UNKNOWN=1
 DEVICE_TYPE="unknown"
 LINUX=$(lsb_release -i | awk -F ":" '{printf $2}')
+if [ $LINUX == "Pop" ]; then
+    LINUX="Ubuntu"
+fi   
 DEBIAN_VERSION=$(lsb_release -c -s) || DEBIAN_VERSION="unknown"
 
 uname -a | grep x86_64 && IS_X86=1 && IS_64_BIT=1 && IS_UNKNOWN=0 || true
@@ -118,14 +121,15 @@ fi
 if [ "$DEBIAN_VERSION" = "buster" ]; then
     grep -qxF "deb http://deb.debian.org/debian buster-backports main" /etc/apt/sources.list  || echo "deb http://deb.debian.org/debian buster-backports main" >> /etc/apt/sources.list
 fi
+
 # Add I2P Repo
 # /bin/bash $TMP_INSTALL_PATH/usr/share/mynode/scripts/add_i2p_repo.sh
 # Not working when Pop_OS
 echo "Importing I2P signing key"
 wget -q -O - https://repo.i2pd.xyz/r4sas.gpg | apt-key --keyring /etc/apt/trusted.gpg.d/i2pd.gpg add -
 echo "Adding I2P APT repository"
-echo "deb https://repo.i2pd.xyz/${DEBIAN_VERSION} main" > /etc/apt/sources.list.d/i2pd.list
-echo "deb-src https://repo.i2pd.xyz/${DEBIAN_VERSION} main" >> /etc/apt/sources.list.d/i2pd.list
+echo "deb https://repo.i2pd.xyz/$LINUX ${DEBIAN_VERSION} main" > /etc/apt/sources.list.d/i2pd.list
+echo "deb-src https://repo.i2pd.xyz/$LINUX ${DEBIAN_VERSION} main" >> /etc/apt/sources.list.d/i2pd.list
 
 # Import Keys
 curl https://keybase.io/roasbeef/pgp_keys.asc | gpg --import
