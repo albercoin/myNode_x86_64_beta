@@ -105,7 +105,7 @@ echo "myNode" > /etc/hostname
 apt-get -y update --allow-releaseinfo-change
 
 # install SSH
-apt-get -y ssh
+apt-get -y install ssh
 
 # Add sources
 apt-get -y install apt-transport-https curl gnupg ca-certificates
