@@ -5,8 +5,6 @@
 ### Run with "sudo"
 ###
 
-su -
-
 set -x
 set -e
 
