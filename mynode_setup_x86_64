@@ -8,11 +8,14 @@
 set -x
 set -e
 
+# Usage: $0 <ip address | online>
 if [ "$#" != "1" ]; then
-    echo "Usage: $0 <ip address | online>"
-    exit 1
+    echo "myNode ONLINE..."
+    SERVER_IP=online
+else
+    echo "myNode IP ADDRESS..."
+    SERVER_IP=$1
 fi
-SERVER_IP=$1
 
 # Determine Device
 
@@ -101,8 +104,12 @@ echo "myNode" > /etc/hostname
 # Update sources
 apt-get -y update --allow-releaseinfo-change
 
+# install SSH
+apt-get -y ssh
+
 # Add sources
 apt-get -y install apt-transport-https curl gnupg ca-certificates
+
 # tor project
 if [ $IS_64_BIT = 1 ]; then
     grep -qxF "deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || echo "deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" >> /etc/apt/sources.list
