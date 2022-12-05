@@ -25,8 +25,8 @@ IS_64_BIT=0
 IS_UNKNOWN=1
 DEVICE_TYPE="unknown"
 LINUX=$(lsb_release -i | awk -F ":" '{printf tolower($2)}')
-if [ $LINUX == "Pop" ]; then
-    LINUX="Ubuntu"
+if [ $LINUX == "pop" ]; then
+    LINUX="ubuntu"
 fi   
 DEBIAN_VERSION=$(lsb_release -c -s) || DEBIAN_VERSION="unknown"
 
@@ -128,8 +128,8 @@ fi
 echo "Importing I2P signing key"
 wget -q -O - https://repo.i2pd.xyz/r4sas.gpg | apt-key --keyring /etc/apt/trusted.gpg.d/i2pd.gpg add -
 echo "Adding I2P APT repository"
-echo "deb https://repo.i2pd.xyz/$LINUX ${DEBIAN_VERSION} main" > /etc/apt/sources.list.d/i2pd.list
-echo "deb-src https://repo.i2pd.xyz/$LINUX ${DEBIAN_VERSION} main" >> /etc/apt/sources.list.d/i2pd.list
+echo "deb https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main" > /etc/apt/sources.list.d/i2pd.list
+echo "deb-src https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main" >> /etc/apt/sources.list.d/i2pd.list
 
 # Import Keys
 curl https://keybase.io/roasbeef/pgp_keys.asc | gpg --import
@@ -206,7 +206,7 @@ fi
 
 # Make sure some software is removed
 apt-get -y purge ntp # (conflicts with systemd-timedatectl)
-if [ $(lsb_release -i | awk -F ":" '{printf $2}') != "Pop" ]; then
+if [ $(lsb_release -i | awk -F ":" '{printf tolower($2)}') != "pop" ]; then
     apt-get -y purge chrony # (conflicts with systemd-timedatectl)
 fi
 
