@@ -19,7 +19,7 @@ else
     SERVER_IP=$1
 fi
 
-apt install lsb-release
+sudo apt -y install lsb-release
 
 # Determine Device
 
@@ -43,20 +43,15 @@ fi
 
 
 # Set kernel settings
-sysctl -w net.ipv6.conf.all.disable_ipv6=1
-sysctl -w net.ipv6.conf.default.disable_ipv6=1
-sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
 
 # Set DNS for install (new)
-echo "" >> /etc/dhcp/dhclient.conf
-echo "append domain-name-servers 1.1.1.1, 208.67.222.222, 8.8.8.8;" >> /etc/dhcp/dhclient.conf
-dhclient -r
-
-# Test DNS resolution issues (may have only seen issues on bad device)
-#ping -c 2 pythonhosted.org
-#ping -c 2 python.org
-
+sudo echo "" >> /etc/dhcp/dhclient.conf
+sudo echo "append domain-name-servers 1.1.1.1, 8.8.8.8;" >> /etc/dhcp/dhclient.conf
+sudo dhclient -r
 
 
 # Download rootfs
@@ -90,32 +85,32 @@ cp -f /tmp/upgrade/out/rootfs_*/usr/bin/mynode-get-device-serial /usr/bin/mynode
 source /tmp/upgrade/out/rootfs_*/usr/share/mynode/mynode_app_versions.sh
 
 # torrc.d dir
-mkdir -p /etc/torrc.d
+sudo mkdir -p /etc/torrc.d
 
 # Create any necessary users
-useradd -p $(openssl passwd -1 bolt) -m -s /bin/bash admin || true
-useradd -m -s /bin/bash bitcoin || true
-useradd -m -s /bin/bash joinmarket || true
-passwd -l root
-adduser admin sudo
+sudo useradd -p $(openssl passwd -1 bolt) -m -s /bin/bash admin || true
+sudo useradd -m -s /bin/bash bitcoin || true
+sudo useradd -m -s /bin/bash joinmarket || true
+sudo passwd -l root
+sudo adduser admin sudo
 
 # Setup bitcoin user folders
-mkdir -p /home/bitcoin/.mynode/
-chown bitcoin:bitcoin /home/bitcoin
-chown -R bitcoin:bitcoin /home/bitcoin/.mynode/
+sudo mkdir -p /home/bitcoin/.mynode/
+sudo chown bitcoin:bitcoin /home/bitcoin
+sudo chown -R bitcoin:bitcoin /home/bitcoin/.mynode/
 
 # Update host info
-# hostnamectl set-hostname myNode
-echo "myNode" > /etc/hostname
+sudo hostnamectl set-hostname myNode
+# echo "myNode" > /etc/hostname
 
 # Update sources
-apt-get -y update --allow-releaseinfo-change
+sudo apt-get -y update --allow-releaseinfo-change
 
 # install SSH
-apt-get -y install ssh
+sudo apt-get -y install ssh
 
 # Add sources
-apt-get -y install apt-transport-https curl gnupg ca-certificates
+sudo apt-get -y install apt-transport-https curl gnupg ca-certificates
 
 # tor project
 if [ $IS_64_BIT = 1 ]; then
@@ -154,41 +149,41 @@ apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 66F6C87B98EBCFE2   # I2
 
 # Update OS
 # Needed to accept new repos
-apt update 
-#apt-get update
+sudo apt update 
+
 
 # Freeze any packages we don't want to update
 if [ $IS_X86 = 1 ]; then
-    apt-mark hold grub*
+    sudo apt-mark hold grub*
 fi
 
 # Upgrade packages
-apt-get -y upgrade
+sudo apt-get -y upgrade
 
 # Install other tools (run section multiple times to make sure success)
 export DEBIAN_FRONTEND=noninteractive
-apt-get -y install apt-transport-https lsb-release
-apt-get -y install htop git curl bash-completion jq dphys-swapfile lsof libzmq3-dev
-apt-get -y install build-essential python3-dev python3-pip python3-grpcio
-apt-get -y install transmission-cli fail2ban ufw tclsh redis-server
-apt-get -y install clang hitch zlib1g-dev libffi-dev file toilet ncdu
-apt-get -y install toilet-fonts avahi-daemon figlet libsecp256k1-dev
-apt-get -y install inotify-tools libssl-dev tor tmux screen fonts-dejavu
-apt-get -y install pv sysstat network-manager rsync parted unzip pkg-config
-apt-get -y install libfreetype6-dev libpng-dev libatlas-base-dev libgmp-dev libltdl-dev
-apt-get -y install libffi-dev libssl-dev python3-bottle automake libtool libltdl7
-apt-get -y -qq install apt-transport-https ca-certificates
-apt-get -y install openjdk-11-jre libevent-dev ncurses-dev
-apt-get -y install zlib1g-dev libudev-dev libusb-1.0-0-dev python3-venv gunicorn
-apt-get -y install sqlite3 libsqlite3-dev torsocks python3-requests libsystemd-dev
-apt-get -y install libjpeg-dev zlib1g-dev psmisc hexyl libbz2-dev liblzma-dev netcat-openbsd
-apt-get -y install hdparm iotop nut obfs4proxy libpq-dev socat btrfs-progs i2pd
+sudo apt-get -y install apt-transport-https lsb-release
+sudo apt-get -y install htop git curl bash-completion jq dphys-swapfile lsof libzmq3-dev
+sudo apt-get -y install build-essential python3-dev python3-pip python3-grpcio
+sudo apt-get -y install transmission-cli fail2ban ufw tclsh redis-server
+sudo apt-get -y install clang hitch zlib1g-dev libffi-dev file toilet ncdu
+sudo apt-get -y install toilet-fonts avahi-daemon figlet libsecp256k1-dev
+sudo apt-get -y install inotify-tools libssl-dev tor tmux screen fonts-dejavu
+sudo apt-get -y install pv sysstat network-manager rsync parted unzip pkg-config
+sudo apt-get -y install libfreetype6-dev libpng-dev libatlas-base-dev libgmp-dev libltdl-dev
+sudo apt-get -y install libffi-dev libssl-dev python3-bottle automake libtool libltdl7
+sudo apt-get -y -qq install apt-transport-https ca-certificates
+sudo apt-get -y install openjdk-11-jre libevent-dev ncurses-dev
+sudo apt-get -y install zlib1g-dev libudev-dev libusb-1.0-0-dev python3-venv gunicorn
+sudo apt-get -y install sqlite3 libsqlite3-dev torsocks python3-requests libsystemd-dev
+sudo apt-get -y install libjpeg-dev zlib1g-dev psmisc hexyl libbz2-dev liblzma-dev netcat-openbsd
+sudo apt-get -y install hdparm iotop nut obfs4proxy libpq-dev socat btrfs-progs i2pd
 
 # Install packages dependent on Debian release
 if [ "$DEBIAN_VERSION" == "bullseye" ] || [ "$DEBIAN_VERSION" == "jammy" ]; then
-    apt-get -y install wireguard
+    sudo apt-get -y install wireguard
 elif [ "$DEBIAN_VERSION" == "buster" ]; then
-    $TORIFY apt-get -y -t buster-backports install wireguard
+    $TORIFY sudo apt-get -y -t buster-backports install wireguard
 else
     echo .
     echo "========================================="
@@ -200,65 +195,40 @@ fi
 
 # Install Openbox GUI if not desktop available
 if [ $IS_X86 = 1 ] && [ -z $DESKTOP_SESSION ]; then
-    apt-get -y install xorg chromium openbox lightdm
+    sudo apt-get -y install xorg chromium openbox lightdm
 fi
 
 # Install device specific packages
 if [ $IS_X86 = 1 ]; then
-    apt-get -y install cloud-init
+    sudo apt-get -y install cloud-init
 fi
 
 # Make sure some software is removed
-apt-get -y purge ntp # (conflicts with systemd-timedatectl)
+sudo apt-get -y purge ntp # (conflicts with systemd-timedatectl)
 if [ $(lsb_release -i | awk -F ":" '{printf tolower($2)}') != "pop" ]; then
-    apt-get -y purge chrony # (conflicts with systemd-timedatectl)
+    sudo apt-get -y purge chrony # (conflicts with systemd-timedatectl)
 fi
 
 # Install other things without recommendation
-apt-get -y install --no-install-recommends expect
+sudo apt-get -y install --no-install-recommends expect
 
 
 # Install nginx
-mkdir -p /var/log/nginx
-$TORIFY apt-get -y install nginx || true
+sudo mkdir -p /var/log/nginx
+$TORIFY sudo apt-get -y install nginx || true
 # Install may fail, so we need to edit the default config file and reconfigure
-rm -f /etc/nginx/modules-enabled/50-mod-* || true
-echo "" > /etc/nginx/sites-available/default
-dpkg --configure -a
+sudo rm -f /etc/nginx/modules-enabled/50-mod-* || true
+sudo echo "" > /etc/nginx/sites-available/default
+sudo dpkg --configure -a
 
 
 # Update users
-usermod -a -G debian-tor bitcoin
+sudo usermod -a -G debian-tor bitcoin
 
 # Make admin a member of bitcoin
-adduser admin bitcoin
-adduser joinmarket bitcoin
-grep "joinmarket" /etc/sudoers || (echo 'joinmarket ALL=(ALL) NOPASSWD:ALL' | EDITOR='tee -a' visudo)
-
-
-# Install Rust (only needed on 32-bit RPi for building some python wheels)
-#if [ ! -f $HOME/.cargo/env ]; then
-#    wget https://sh.rustup.rs -O /tmp/setup_rust.sh
-#    /bin/bash /tmp/setup_rust.sh -y --default-toolchain none
-#    sync
-#fi
-#if [ -f $HOME/.cargo/env ]; then
-#    # Remove old toolchains
-#    source $HOME/.cargo/env
-#    TOOLCHAINS=$(rustup toolchain list)
-#    for toolchain in $TOOLCHAINS; do
-#        if [[ "$toolchain" == *"linux"* ]] && [[ "$toolchain" != *"${RUST_VERSION}"* ]]; then
-#            rustup toolchain remove $toolchain || true
-#        fi
-#    done
-#    # Manage rust toolchains
-#    if [ $IS_RASPI = 1 ] && [ $IS_RASPI4_ARM64 = 0 ]; then
-#        # Install and use desired version
-#        rustup install $RUST_VERSION
-#        rustup default $RUST_VERSION
-#        rustc --version
-#    fi
-#fi
+sudo adduser admin bitcoin
+sudo adduser joinmarket bitcoin
+sudo grep "joinmarket" /etc/sudoers || (echo 'joinmarket ALL=(ALL) NOPASSWD:ALL' | EDITOR='tee -a' visudo)
 
 
 # Install Python3 (latest)
@@ -273,7 +243,7 @@ if [[ "$CURRENT_PYTHON3_VERSION" != *"Python ${PYTHON_VERSION}"* ]]; then
 
     cd Python-*
     ./configure
-    make -j4
+    make -j "$(($(nproc)))"
     make install
     cd ~
 else
@@ -292,7 +262,7 @@ pip3 install -r $TMP_INSTALL_PATH/usr/share/mynode/mynode_pip3_requirements.txt 
 # Install node
 if [ ! -f /tmp/installed_node ]; then
     curl -sL https://deb.nodesource.com/setup_$NODE_JS_VERSION | bash -
-    apt-get install -y nodejs
+    sudo apt-get install -y nodejs
     touch /tmp/installed_node
 fi
 
@@ -305,8 +275,8 @@ if [ LINUX == "debian" ]; then
     echo \
       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
       $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-    apt-get update --allow-releaseinfo-change
-    apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true
+    sudo apt-get update --allow-releaseinfo-change
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true
 
 elif [ LINUX == "ubuntu" ]; then
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -315,22 +285,22 @@ elif [ LINUX == "ubuntu" ]; then
       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
       $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-    apt-get update --allow-releaseinfo-change
-    apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true 
+    sudo apt-get update --allow-releaseinfo-change
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true 
 else
-    apt update --allow-releaseinfo-change
-    apt install -y docker docker-compose
+    sudo apt update --allow-releaseinfo-change
+    sudo apt install -y docker docker-compose
 fi
 
 # Use systemd for managing docker
-rm -f /etc/init.d/docker
-rm -f /etc/systemd/system/multi-user.target.wants/docker.service
-systemctl -f enable docker.service
+sudo rm -f /etc/init.d/docker
+sudo rm -f /etc/systemd/system/multi-user.target.wants/docker.service
+sudo systemctl -f enable docker.service
 
-groupadd docker || true
-usermod -aG docker admin
-usermod -aG docker bitcoin
-usermod -aG docker root
+sudo groupadd docker || true
+sudo usermod -aG docker admin
+sudo usermod -aG docker bitcoin
+sudo usermod -aG docker root
 
 # Install node packages
 npm install -g pug-cli browserify uglify-js babel-cli
@@ -339,8 +309,8 @@ npm install -g yarn
 
 
 # Remove existing MOTD login info
-rm -rf /etc/motd
-rm -rf /etc/update-motd.d/*
+sudo rm -rf /etc/motd
+sudo rm -rf /etc/update-motd.d/*
 
 #########################################################
 
@@ -375,7 +345,7 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     # Install Bitcoin
     tar -xvf bitcoin-$BTC_VERSION-$ARCH.tar.gz
     mv bitcoin-$BTC_VERSION bitcoin
-    install -m 0755 -o root -g root -t /usr/local/bin bitcoin/bin/*
+    sudo install -m 0755 -o root -g root -t /usr/local/bin bitcoin/bin/*
     
     if [ ! -L /home/bitcoin/.bitcoin ]; then
         sudo -u bitcoin ln -s /mnt/hdd/mynode/bitcoin /home/bitcoin/.bitcoin
@@ -383,7 +353,7 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     if [ ! -L /home/bitcoin/.lnd ]; then
         sudo -u bitcoin ln -s /mnt/hdd/mynode/lnd /home/bitcoin/.lnd
     fi
-    mkdir -p /home/admin/.bitcoin
+    sudo mkdir -p /home/admin/.bitcoin
     echo $BTC_VERSION > $BTC_VERSION_FILE
 
     # Install bash-completion for bitcoin-cli
@@ -461,7 +431,7 @@ if [ "$CURRENT" != "$LOOP_VERSION" ]; then
         # Install Loop
         tar -xzf loop-*.tar.gz
         mv $LOOP_ARCH-$LOOP_VERSION loop
-        install -m 0755 -o root -g root -t /usr/local/bin loop/*
+        sudo install -m 0755 -o root -g root -t /usr/local/bin loop/*
 
         # Mark current version
         echo $LOOP_VERSION > $LOOP_VERSION_FILE
@@ -531,7 +501,7 @@ if [ "$CURRENT" != "$LIT_VERSION" ]; then
         # Install lit
         tar -xzf lightning-terminal-*.tar.gz
         mv $LIT_ARCH-$LIT_VERSION lightning-terminal
-        install -m 0755 -o root -g root -t /usr/local/bin lightning-terminal/lit*
+        sudo install -m 0755 -o root -g root -t /usr/local/bin lightning-terminal/lit*
 
         # Mark current version
         echo $LIT_VERSION > $LIT_VERSION_FILE
@@ -543,8 +513,8 @@ cd ~
 
 
 # Setup "install" location for some apps
-mkdir -p /opt/mynode
-chown -R bitcoin:bitcoin /opt/mynode
+sudo mkdir -p /opt/mynode
+sudo chown -R bitcoin:bitcoin /opt/mynode
 
 
 # Install LND Hub
@@ -630,8 +600,8 @@ if [ "$CURRENT" != "$SECP256K1_VERSION" ]; then
 
     ./autogen.sh
     ./configure --enable-module-recovery --disable-jni --enable-experimental --enable-module-ecdh --enable-benchmark=no
-    make
-    make install
+    make "$(($(nproc)))"
+    sudo make install
     cp -f include/* /usr/include/
 
     echo $SECP256K1_VERSION > $SECP256K1_VERSION_FILE
@@ -661,12 +631,6 @@ if [ "$CURRENT" != "$JOININBOX_VERSION" ]; then
 
     chmod -R +x ./joininbox/
     sudo -u joinmarket cp -rf ./joininbox/scripts/* .
-
-    # Use Python3.7 on RP4 32-bit
-    #JM_ENV_VARS=""
-    #if [ $IS_32_BIT = 1 ]; then
-    #    JM_ENV_VARS="export JM_PYTHON=python3.7; "
-    #fi
 
     # Install
     sudo -u joinmarket bash -c "cd /home/joinmarket/; ${JM_ENV_VARS} ./install.joinmarket.sh --install install" || true
@@ -851,14 +815,14 @@ if [ ! -f /usr/bin/ngrok  ]; then
 fi
 
 # Make sure "Remote Access" apps are marked installed
-touch /home/bitcoin/.mynode/install_tor
-touch /home/bitcoin/.mynode/install_premium_plus
-touch /home/bitcoin/.mynode/install_vpn
+sudo touch /home/bitcoin/.mynode/install_tor
+sudo touch /home/bitcoin/.mynode/install_premium_plus
+sudo touch /home/bitcoin/.mynode/install_vpn
 
 # Mark docker images for install (on SD so install occurs after drive attach)
-touch /home/bitcoin/.mynode/install_mempool
-touch /home/bitcoin/.mynode/install_btcpayserver
-touch /home/bitcoin/.mynode/install_dojo
+sudo touch /home/bitcoin/.mynode/install_mempool
+sudo touch /home/bitcoin/.mynode/install_btcpayserver
+sudo touch /home/bitcoin/.mynode/install_dojo
 
 # SKIPPING LNBITS - OPTIONAL ALL
 # SKIPPING CKBUNKER - OPTIONAL APP
@@ -869,16 +833,16 @@ touch /home/bitcoin/.mynode/install_dojo
 
 
 # Make sure we are using legacy iptables
-update-alternatives --set iptables /usr/sbin/iptables-legacy || true
-update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy || true
+sudo update-alternatives --set iptables /usr/sbin/iptables-legacy || true
+sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy || true
 
 
 #########################################################
 
 
 # Install files (downloaded and extracted earlier)
-rsync -r -K /tmp/upgrade/out/rootfs_*/* /
-sync
+sudo rsync -r -K /tmp/upgrade/out/rootfs_*/* /
+sudo sync
 sleep 1
 
 
@@ -890,90 +854,90 @@ sleep 1
 
 
 # Random Cleanup
-rm -rf /opt/download
-mkdir -p /opt/download
+sudo rm -rf /opt/download
+sudo mkdir -p /opt/download
 
 # Clean apt-cache
-apt-get autoclean
-apt-get autoremove -y
+sudo apt-get autoclean
+sudo apt-get -y autoremove
 
 # Setup myNode Startup Script
-systemctl daemon-reload
-systemctl enable check_in
-systemctl enable premium_plus_connect
-systemctl enable background
-systemctl enable docker
-systemctl enable mynode
-systemctl enable quicksync
-systemctl enable torrent_check
-systemctl enable firewall
-systemctl enable bandwidth
-systemctl enable www
-systemctl enable drive_check
-systemctl enable bitcoin
-systemctl enable seed_bitcoin_peers
-systemctl enable lnd
-systemctl enable loop
-systemctl enable pool
-systemctl enable lit
+sudo systemctl daemon-reload
+sudo systemctl enable check_in
+sudo systemctl enable premium_plus_connect
+sudo systemctl enable background
+sudo systemctl enable docker
+sudo systemctl enable mynode
+sudo systemctl enable quicksync
+sudo systemctl enable torrent_check
+sudo systemctl enable firewall
+sudo systemctl enable bandwidth
+sudo systemctl enable www
+sudo systemctl enable drive_check
+sudo systemctl enable bitcoin
+sudo systemctl enable seed_bitcoin_peers
+sudo systemctl enable lnd
+sudo systemctl enable loop
+sudo systemctl enable pool
+sudo systemctl enable lit
 #systemctl enable lnd_unlock # NOT NECESSARY WITH LND 0.13+
-systemctl enable lnd_backup
-systemctl enable lnd_admin_files
-systemctl enable lndconnect
-systemctl enable redis-server
+sudo systemctl enable lnd_backup
+sudo systemctl enable lnd_admin_files
+sudo systemctl enable lndconnect
+sudo systemctl enable redis-server
 #systemctl enable mongodb
 #systemctl enable electrs # DISABLED BY DEFAULT
 #systemctl enable lndhub # DISABLED BY DEFAULT
 #systemctl enable btcrpcexplorer # DISABLED BY DEFAULT
-systemctl enable rtl
-systemctl enable tor
-systemctl enable i2pd
-systemctl enable invalid_block_check
-systemctl enable usb_driver_check
-systemctl enable docker_images
-systemctl enable glances
+sudo systemctl enable rtl
+sudo systemctl enable tor
+sudo systemctl enable i2pd
+sudo systemctl enable invalid_block_check
+sudo systemctl enable usb_driver_check
+sudo systemctl enable docker_images
+sudo systemctl enable glances
 #systemctl enable netdata # DISABLED BY DEFAULT
-systemctl enable webssh2
-systemctl enable rotate_logs
-systemctl enable corsproxy_btcrpc
-systemctl enable usb_extras
-systemctl enable ob-watcher
+sudo systemctl enable webssh2
+sudo systemctl enable rotate_logs
+sudo systemctl enable corsproxy_btcrpc
+sudo systemctl enable usb_extras
+sudo systemctl enable ob-watcher
 
 
 # Disable services
-systemctl disable hitch || true
-systemctl disable mongodb || true
-systemctl disable dhcpcd || true
+sudo systemctl disable hitch || true
+sudo systemctl disable mongodb || true
+sudo systemctl disable dhcpcd || true
 
 
 # Delete junk
-rm -rf /home/admin/download
-rm -rf /home/admin/.bash_history
-rm -rf /home/bitcoin/.bash_history
-rm -rf /root/.bash_history
-rm -rf /root/.ssh/known_hosts
-rm -rf /etc/resolv.conf
-rm -rf /tmp/*
-rm -rf ~/setup_device.sh
-rm -rf /etc/motd # Remove simple motd for update-motd.d
+sudo rm -rf /home/admin/download
+sudo rm -rf /home/admin/.bash_history
+sudo rm -rf /home/bitcoin/.bash_history
+sudo rm -rf /root/.bash_history
+sudo rm -rf /root/.ssh/known_hosts
+sudo rm -rf /etc/resolv.conf
+sudo rm -rf /tmp/*
+sudo rm -rf ~/setup_device.sh
+sudo rm -rf /etc/motd # Remove simple motd for update-motd.d
 
 # Remove default debian stuff
-deluser mynode || true
-rm -rf /home/mynode || true
+sudo deluser mynode || true
+sudo rm -rf /home/mynode || true
 
 # Add fsck force to startup for x86
 if [ $IS_X86 = 1 ]; then
-    sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"quiet fsck.mode=force fsck.repair=yes\"/g" /etc/default/grub
-    update-grub
+    sudo sed -i "s/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT=\"quiet fsck.mode=force fsck.repair=yes\"/g" /etc/default/grub
+    sudo update-grub
 fi
 
 # Add generic boot option if UEFI
 if [ -f /boot/efi/EFI/debian/grubx64.efi ]; then
-    mkdir -p /boot/efi/EFI/BOOT
-    cp -f /boot/efi/EFI/debian/grubx64.efi /boot/efi/EFI/BOOT/bootx64.efi
+    sudo mkdir -p /boot/efi/EFI/BOOT
+    sudo cp -f /boot/efi/EFI/debian/grubx64.efi /boot/efi/EFI/BOOT/bootx64.efi
 fi
 
-sync
+sudo sync
 
 set +x
 echo ""
