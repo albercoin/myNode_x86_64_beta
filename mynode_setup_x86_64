@@ -348,9 +348,11 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     sudo install -m 0755 -o root -g root -t /usr/local/bin bitcoin/bin/*
     
     if [ ! -L /home/bitcoin/.bitcoin ]; then
+        sudo rm -f /home/bitcoin/.bitcoin
         sudo -u bitcoin ln -s /mnt/hdd/mynode/bitcoin /home/bitcoin/.bitcoin
     fi
     if [ ! -L /home/bitcoin/.lnd ]; then
+        sudo rm -f /home/bitcoin/.lnd
         sudo -u bitcoin ln -s /mnt/hdd/mynode/lnd /home/bitcoin/.lnd
     fi
     sudo mkdir -p /home/admin/.bitcoin
@@ -390,6 +392,7 @@ if [ "$CURRENT" != "$LND_VERSION" ]; then
     sudo tar -xzf lnd-*.tar.gz
     sudo mv $LND_ARCH-$LND_VERSION lnd
     sudo install -m 0755 -o root -g root -t /usr/local/bin lnd/*
+    sudo rm -f /usr/bin/ip
     sudo ln -s /bin/ip /usr/bin/ip || true
 
     echo $LND_VERSION > LND_VERSION_FILE
@@ -538,7 +541,9 @@ if [ "$CURRENT" != "$LNDHUB_VERSION" ]; then
 
     cd LndHub
     sudo -u bitcoin npm install --only=production
+    sudo rm -f tls.cert
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/tls.cert tls.cert
+    sudo rm -f admin.macaroon
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/data/chain/bitcoin/mainnet/admin.macaroon admin.macaroon
     echo $LNDHUB_VERSION > LNDHUB_VERSION_FILE
 fi
@@ -855,7 +860,7 @@ sudo rm -rf /opt/download
 sudo mkdir -p /opt/download
 
 # Clean apt-cache
-sudo apt-get autoclean
+sudo apt-get -y autoclean
 sudo apt-get -y autoremove
 
 # Setup myNode Startup Script
