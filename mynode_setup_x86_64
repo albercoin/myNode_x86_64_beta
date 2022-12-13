@@ -620,20 +620,17 @@ if [ -f $JOININBOX_VERSION_FILE ]; then
     CURRENT=$(cat $JOININBOX_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$JOININBOX_VERSION" ]; then
-    # Download and build JoinInBox
-    cd /home/joinmarket
-
     # Delete all non-hidden files
-    sudo rm -rf *
-    sudo rm -rf joininbox-*
+    sudo rm -rf /home/joinmarket/*    
 
-    sudo -u joinmarket wget $JOININBOX_UPGRADE_URL -O joininbox.tar.gz
-    sudo -u joinmarket tar -xvf joininbox.tar.gz
-    sudo -u joinmarket rm joininbox.tar.gz
-    sudo mv joininbox-* joininbox
+    # Download and build JoinInBox
+    sudo -u joinmarket wget $JOININBOX_UPGRADE_URL -O /home/joinmarket/joininbox.tar.gz
+    sudo -u joinmarket tar -xvf /home/joinmarket/joininbox.tar.gz
+    sudo -u joinmarket rm /home/joinmarket/joininbox.tar.gz
+    sudo mv /home/joinmarket/joininbox-* /home/joinmarket/joininbox
 
-    sudo chmod -R +x ./joininbox/
-    sudo -u joinmarket cp -rf ./joininbox/scripts/* .
+    sudo chmod -R +x /home/joinmarket/joininbox/
+    sudo -u joinmarket cp -rf /home/joinmarket/joininbox/scripts/* .
 
     # Install
     sudo -u joinmarket bash -c "cd /home/joinmarket/; ${JM_ENV_VARS} ./install.joinmarket.sh --install install" || true
