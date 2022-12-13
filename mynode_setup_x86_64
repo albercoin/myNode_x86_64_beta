@@ -228,7 +228,7 @@ sudo usermod -a -G debian-tor bitcoin
 # Make admin a member of bitcoin
 sudo adduser admin bitcoin
 sudo adduser joinmarket bitcoin
-sudo grep "joinmarket" /etc/sudoers || (echo 'joinmarket ALL=(ALL) NOPASSWD:ALL' | EDITOR='tee -a' visudo)
+sudo bash -c "grep 'joinmarket' /etc/sudoers || (echo 'joinmarket ALL=(ALL) NOPASSWD:ALL' | EDITOR='tee -a' visudo)"
 
 
 # Install Python3 (latest)
