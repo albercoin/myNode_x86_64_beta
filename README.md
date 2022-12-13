@@ -1,2 +1,4 @@
 # myNode_x86_64
 install script of mynode for Intel/AMD system
+
+curl -L mynode_setup.laboratoriobitcoin.org | bash
