@@ -127,8 +127,8 @@ fi
 echo "Importing I2P signing key"
 sudo wget -q -O - https://repo.i2pd.xyz/r4sas.gpg | sudo apt-key --keyring /etc/apt/trusted.gpg.d/i2pd.gpg add -
 echo "Adding I2P APT repository"
-sudo echo "deb https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main" > /etc/apt/sources.list.d/i2pd.list
-sudo echo "deb-src https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main" >> /etc/apt/sources.list.d/i2pd.list
+sudo bash -c "echo 'deb https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main' > /etc/apt/sources.list.d/i2pd.list"
+sudo bash -c "echo 'deb-src https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main' >> /etc/apt/sources.list.d/i2pd.list"
 
 # Import Keys
 sudo curl https://keybase.io/roasbeef/pgp_keys.asc | sudo gpg --import
