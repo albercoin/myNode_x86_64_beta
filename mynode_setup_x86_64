@@ -55,9 +55,9 @@ sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
 
 # Download rootfs
-rm -rf /tmp/rootfs.tar.gz
-rm -rf /tmp/upgrade/
-mkdir -p /tmp/upgrade
+sudo rm -rf /tmp/rootfs.tar.gz
+sudo rm -rf /tmp/upgrade/
+sudo mkdir -p /tmp/upgrade
 
 TARBALL=""
 if [ $IS_X86 = 1 ]; then
@@ -65,21 +65,21 @@ if [ $IS_X86 = 1 ]; then
 fi
 if [ "$SERVER_IP" == "online" ]; then
     TARBALL="${TARBALL/"mynode_rootfs_"/"mynode_release_latest_"}"
-    wget https://mynodebtc.com/device/upgrade_images/${TARBALL} -O /tmp/rootfs.tar.gz
+    sudo wget https://mynodebtc.com/device/upgrade_images/${TARBALL} -O /tmp/rootfs.tar.gz
 else
-    wget http://${SERVER_IP}:8000/${TARBALL} -O /tmp/rootfs.tar.gz
+    sudo wget http://${SERVER_IP}:8000/${TARBALL} -O /tmp/rootfs.tar.gz
 fi
 
 # Extract rootfs (so we can reference temporary files)
-tar -xvf /tmp/rootfs.tar.gz -C /tmp/upgrade/
+sudo tar -xvf /tmp/rootfs.tar.gz -C /tmp/upgrade/
 TMP_INSTALL_PATH="/tmp/upgrade/out/rootfs_*"
 
 # Setup some dependencies
-mkdir -p /usr/share/mynode/
-cp -f /tmp/upgrade/out/rootfs_*/usr/share/mynode/mynode_device_info.sh /usr/share/mynode/mynode_device_info.sh
-cp -f /tmp/upgrade/out/rootfs_*/usr/share/mynode/mynode_config.sh /usr/share/mynode/mynode_config.sh
-cp -f /tmp/upgrade/out/rootfs_*/usr/share/mynode/mynode_functions.sh /usr/share/mynode/mynode_functions.sh
-cp -f /tmp/upgrade/out/rootfs_*/usr/bin/mynode-get-device-serial /usr/bin/mynode-get-device-serial
+sudo mkdir -p /usr/share/mynode/
+sudo cp -f /tmp/upgrade/out/rootfs_*/usr/share/mynode/mynode_device_info.sh /usr/share/mynode/mynode_device_info.sh
+sudo cp -f /tmp/upgrade/out/rootfs_*/usr/share/mynode/mynode_config.sh /usr/share/mynode/mynode_config.sh
+sudo cp -f /tmp/upgrade/out/rootfs_*/usr/share/mynode/mynode_functions.sh /usr/share/mynode/mynode_functions.sh
+sudo cp -f /tmp/upgrade/out/rootfs_*/usr/bin/mynode-get-device-serial /usr/bin/mynode-get-device-serial
 
 # Source file containing app versions
 source /tmp/upgrade/out/rootfs_*/usr/share/mynode/mynode_app_versions.sh
@@ -101,7 +101,7 @@ sudo chown -R bitcoin:bitcoin /home/bitcoin/.mynode/
 
 # Update host info
 sudo hostnamectl set-hostname myNode
-# echo "myNode" > /etc/hostname
+# sudo echo "myNode" > /etc/hostname
 
 # Update sources
 sudo apt-get -y update --allow-releaseinfo-change
@@ -114,38 +114,38 @@ sudo apt-get -y install apt-transport-https curl gnupg ca-certificates
 
 # tor project
 if [ $IS_64_BIT = 1 ]; then
-    grep -qxF "deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || echo "deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" >> /etc/apt/sources.list
-    grep -qxF "deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || echo "deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" >> /etc/apt/sources.list
+    sudo grep -qxF "deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || echo "deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" >> /etc/apt/sources.list
+    sudo grep -qxF "deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || echo "deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" >> /etc/apt/sources.list
 fi
 if [ "$DEBIAN_VERSION" = "buster" ]; then
-    grep -qxF "deb http://deb.debian.org/debian buster-backports main" /etc/apt/sources.list  || echo "deb http://deb.debian.org/debian buster-backports main" >> /etc/apt/sources.list
+    sudo grep -qxF "deb http://deb.debian.org/debian buster-backports main" /etc/apt/sources.list  || echo "deb http://deb.debian.org/debian buster-backports main" >> /etc/apt/sources.list
 fi
 
 # Add I2P Repo
 # /bin/bash $TMP_INSTALL_PATH/usr/share/mynode/scripts/add_i2p_repo.sh
 # Not working when Pop_OS
 echo "Importing I2P signing key"
-wget -q -O - https://repo.i2pd.xyz/r4sas.gpg | apt-key --keyring /etc/apt/trusted.gpg.d/i2pd.gpg add -
+sudo wget -q -O - https://repo.i2pd.xyz/r4sas.gpg | apt-key --keyring /etc/apt/trusted.gpg.d/i2pd.gpg add -
 echo "Adding I2P APT repository"
-echo "deb https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main" > /etc/apt/sources.list.d/i2pd.list
-echo "deb-src https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main" >> /etc/apt/sources.list.d/i2pd.list
+sudo echo "deb https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main" > /etc/apt/sources.list.d/i2pd.list
+sudo echo "deb-src https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main" >> /etc/apt/sources.list.d/i2pd.list
 
 # Import Keys
-curl https://keybase.io/roasbeef/pgp_keys.asc | gpg --import
-curl https://keybase.io/bitconner/pgp_keys.asc | gpg --import
-curl https://keybase.io/guggero/pgp_keys.asc | gpg --import # Pool
-curl https://raw.githubusercontent.com/JoinMarket-Org/joinmarket-clientserver/master/pubkeys/AdamGibson.asc | gpg --import
-gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 01EA5486DE18A882D4C2684590C8019E36C2E964
-gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys E777299FC265DD04793070EB944D35F9AC3DB76A # Bitcoin - Michael Ford (fanquake)
-curl https://keybase.io/suheb/pgp_keys.asc | gpg --import
-curl https://samouraiwallet.com/pgp.txt | gpg --import # two keys from Samourai team
-gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys DE23E73BFA8A0AD5587D2FCDE80D2F3F311FD87E #loopd
-gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 26984CB69EB8C4A26196F7A4D7D916376026F177 # Lightning Terminal
-wget -q https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc -O- | apt-key add - # Tor
-gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 648ACFD622F3D138     # Debian Backports
-gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9     # Debian Backports
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 74A941BA219EC810   # Tor
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 66F6C87B98EBCFE2   # I2P (R4SAS)
+sudo curl https://keybase.io/roasbeef/pgp_keys.asc | gpg --import
+sudo curl https://keybase.io/bitconner/pgp_keys.asc | gpg --import
+sudo curl https://keybase.io/guggero/pgp_keys.asc | gpg --import # Pool
+sudo curl https://raw.githubusercontent.com/JoinMarket-Org/joinmarket-clientserver/master/pubkeys/AdamGibson.asc | gpg --import
+sudo gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 01EA5486DE18A882D4C2684590C8019E36C2E964
+sudo gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys E777299FC265DD04793070EB944D35F9AC3DB76A # Bitcoin - Michael Ford (fanquake)
+sudo curl https://keybase.io/suheb/pgp_keys.asc | gpg --import
+sudo curl https://samouraiwallet.com/pgp.txt | gpg --import # two keys from Samourai team
+sudo gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys DE23E73BFA8A0AD5587D2FCDE80D2F3F311FD87E #loopd
+sudo gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 26984CB69EB8C4A26196F7A4D7D916376026F177 # Lightning Terminal
+sudo wget -q https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc -O- | apt-key add - # Tor
+sudo gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 648ACFD622F3D138     # Debian Backports
+sudo gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9     # Debian Backports
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 74A941BA219EC810   # Tor
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 66F6C87B98EBCFE2   # I2P (R4SAS)
 
 # Update OS
 # Needed to accept new repos
@@ -234,17 +234,17 @@ sudo grep "joinmarket" /etc/sudoers || (echo 'joinmarket ALL=(ALL) NOPASSWD:ALL'
 # Install Python3 (latest)
 CURRENT_PYTHON3_VERSION=$(python3 --version)
 if [[ "$CURRENT_PYTHON3_VERSION" != *"Python ${PYTHON_VERSION}"* ]]; then
-    mkdir -p /opt/download
-    cd /opt/download
-    rm -rf Python-*
+    sudo mkdir -p /opt/download
+    sudo cd /opt/download
+    sudo rm -rf Python-*
 
-    wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz -O python.tar.xz
-    tar xf python.tar.xz
+    sudo wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz -O python.tar.xz
+    sudo tar xf python.tar.xz
 
-    cd Python-*
-    ./configure
-    make -j "$(($(nproc)))"
-    make install
+    sudo cd Python-*
+    sudo ./configure
+    sudo make -j "$(($(nproc)))"
+    sudo make install
     cd ~
 else
     echo "Python up to date"
@@ -252,36 +252,36 @@ fi
 
 
 # Install Python3 specific tools
-pip3 install --upgrade pip wheel setuptools
+sudo pip3 install --upgrade pip wheel setuptools
 
-pip3 install -r $TMP_INSTALL_PATH/usr/share/mynode/mynode_pip3_requirements.txt --no-cache-dir || \
-    pip3 install -r $TMP_INSTALL_PATH/usr/share/mynode/mynode_pip3_requirements.txt --no-cache-dir --use-deprecated=html5lib
+sudo pip3 install -r $TMP_INSTALL_PATH/usr/share/mynode/mynode_pip3_requirements.txt --no-cache-dir || \
+    sudo pip3 install -r $TMP_INSTALL_PATH/usr/share/mynode/mynode_pip3_requirements.txt --no-cache-dir --use-deprecated=html5lib
 
 
 
 # Install node
 if [ ! -f /tmp/installed_node ]; then
-    curl -sL https://deb.nodesource.com/setup_$NODE_JS_VERSION | bash -
+    sudo curl -sL https://deb.nodesource.com/setup_$NODE_JS_VERSION | sudo bash -
     sudo apt-get install -y nodejs
-    touch /tmp/installed_node
+    sudo touch /tmp/installed_node
 fi
 
 # Install docker
-mkdir -p /etc/apt/keyrings
+sudo mkdir -p /etc/apt/keyrings
 
 
 if [ LINUX == "debian" ]; then
-    curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
-    echo \
+    sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo echo \
       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
       $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get update --allow-releaseinfo-change
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true
 
 elif [ LINUX == "ubuntu" ]; then
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
 
-    echo \
+    sudo echo \
       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
       $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
@@ -303,9 +303,9 @@ sudo usermod -aG docker bitcoin
 sudo usermod -aG docker root
 
 # Install node packages
-npm install -g pug-cli browserify uglify-js babel-cli
-npm install -g npm@$NODE_NPM_VERSION
-npm install -g yarn
+sudo npm install -g pug-cli browserify uglify-js babel-cli
+sudo npm install -g npm@$NODE_NPM_VERSION
+sudo npm install -g yarn
 
 
 # Remove existing MOTD login info
@@ -332,19 +332,19 @@ if [ -f $BTC_VERSION_FILE ]; then
 fi
 if [ "$CURRENT" != "$BTC_VERSION" ]; then
     # Download and install Bitcoin
-    rm -rf /opt/download
-    mkdir -p /opt/download
-    cd /opt/download
+    sudo rm -rf /opt/download
+    sudo mkdir -p /opt/download
+    sudo cd /opt/download
 
-    wget $BTC_UPGRADE_URL
-    wget $BTC_UPGRADE_SHA256SUM_URL -O SHA256SUMS
-    wget $BTC_UPGRADE_SHA256SUM_ASC_URL -O SHA256SUMS.asc
+    sudo wget $BTC_UPGRADE_URL
+    sudo wget $BTC_UPGRADE_SHA256SUM_URL -O SHA256SUMS
+    sudo wget $BTC_UPGRADE_SHA256SUM_ASC_URL -O SHA256SUMS.asc
 
-    sha256sum --ignore-missing --check SHA256SUMS
+    sudo sha256sum --ignore-missing --check SHA256SUMS
 
     # Install Bitcoin
-    tar -xvf bitcoin-$BTC_VERSION-$ARCH.tar.gz
-    mv bitcoin-$BTC_VERSION bitcoin
+    sudo tar -xvf bitcoin-$BTC_VERSION-$ARCH.tar.gz
+    sudo mv bitcoin-$BTC_VERSION bitcoin
     sudo install -m 0755 -o root -g root -t /usr/local/bin bitcoin/bin/*
     
     if [ ! -L /home/bitcoin/.bitcoin ]; then
@@ -354,10 +354,10 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
         sudo -u bitcoin ln -s /mnt/hdd/mynode/lnd /home/bitcoin/.lnd
     fi
     sudo mkdir -p /home/admin/.bitcoin
-    echo $BTC_VERSION > $BTC_VERSION_FILE
+    sudo echo $BTC_VERSION > $BTC_VERSION_FILE
 
     # Install bash-completion for bitcoin-cli
-    wget $BTC_CLI_COMPLETION_URL -O bitcoin-cli.bash-completion
+    sudo wget $BTC_CLI_COMPLETION_URL -O bitcoin-cli.bash-completion
     sudo cp bitcoin-cli.bash-completion /etc/bash_completion.d/bitcoin-cli
 fi
 cd ~
@@ -375,28 +375,28 @@ if [ -f $LND_VERSION_FILE ]; then
     CURRENT=$(cat $LND_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$LND_VERSION" ]; then
-    rm -rf /opt/download
-    mkdir -p /opt/download
-    cd /opt/download
+    sudo rm -rf /opt/download
+    sudo mkdir -p /opt/download
+    sudo cd /opt/download
 
-    wget $LND_UPGRADE_URL
-    wget $LND_UPGRADE_MANIFEST_URL -O manifest.txt
-    wget $LND_UPGRADE_MANIFEST_ROASBEEF_SIG_URL -O manifest_roasbeef.txt.sig || true
-    wget $LND_UPGRADE_MANIFEST_GUGGERO_SIG_URL -O manifest_guggero.txt.sig || true
+    sudo wget $LND_UPGRADE_URL
+    sudo wget $LND_UPGRADE_MANIFEST_URL -O manifest.txt
+    sudo wget $LND_UPGRADE_MANIFEST_ROASBEEF_SIG_URL -O manifest_roasbeef.txt.sig || true
+    sudo wget $LND_UPGRADE_MANIFEST_GUGGERO_SIG_URL -O manifest_guggero.txt.sig || true
 
-    gpg --verify manifest_roasbeef.txt.sig manifest.txt || \
-    gpg --verify manifest_guggero.txt.sig manifest.txt
+    sudo gpg --verify manifest_roasbeef.txt.sig manifest.txt || \
+        sudo gpg --verify manifest_guggero.txt.sig manifest.txt
 
-    tar -xzf lnd-*.tar.gz
-    mv $LND_ARCH-$LND_VERSION lnd
-    install -m 0755 -o root -g root -t /usr/local/bin lnd/*
-    ln -s /bin/ip /usr/bin/ip || true
+    sudo tar -xzf lnd-*.tar.gz
+    sudo mv $LND_ARCH-$LND_VERSION lnd
+    sudo install -m 0755 -o root -g root -t /usr/local/bin lnd/*
+    sudo ln -s /bin/ip /usr/bin/ip || true
 
-    echo $LND_VERSION > $LND_VERSION_FILE
+    sudo echo $LND_VERSION > $LND_VERSION_FILE
 
     # Download bash-completion file for lncli
-    wget $LNCLI_COMPLETION_URL
-    sudo cp lncli.bash-completion /etc/bash_completion.d/lncli
+    sudo wget $LNCLI_COMPLETION_URL
+    sudo sudo cp lncli.bash-completion /etc/bash_completion.d/lncli
 fi
 cd ~
 
@@ -418,23 +418,23 @@ if [ -f $LOOP_VERSION_FILE ]; then
 fi
 if [ "$CURRENT" != "$LOOP_VERSION" ]; then
     # Download and install Loop
-    rm -rf /opt/download
-    mkdir -p /opt/download
-    cd /opt/download
+    sudo rm -rf /opt/download
+    sudo mkdir -p /opt/download
+    sudo cd /opt/download
 
-    wget $LOOP_UPGRADE_URL
-    wget $LOOP_UPGRADE_MANIFEST_URL -O manifest.txt
-    wget $LOOP_UPGRADE_MANIFEST_SIG_URL -O manifest.txt.sig
+    sudo wget $LOOP_UPGRADE_URL
+    sudo wget $LOOP_UPGRADE_MANIFEST_URL -O manifest.txt
+    sudo wget $LOOP_UPGRADE_MANIFEST_SIG_URL -O manifest.txt.sig
 
-    gpg --verify manifest.txt.sig manifest.txt
+    sudo gpg --verify manifest.txt.sig manifest.txt
     if [ $? == 0 ]; then
         # Install Loop
-        tar -xzf loop-*.tar.gz
-        mv $LOOP_ARCH-$LOOP_VERSION loop
+        sudo tar -xzf loop-*.tar.gz
+        sudo mv $LOOP_ARCH-$LOOP_VERSION loop
         sudo install -m 0755 -o root -g root -t /usr/local/bin loop/*
 
         # Mark current version
-        echo $LOOP_VERSION > $LOOP_VERSION_FILE
+        sudo echo $LOOP_VERSION > $LOOP_VERSION_FILE
     else
         echo "ERROR UPGRADING LND - GPG FAILED"
     fi
@@ -453,23 +453,23 @@ if [ -f $POOL_VERSION_FILE ]; then
 fi
 if [ "$CURRENT" != "$POOL_VERSION" ]; then
     # Download and install pool
-    rm -rf /opt/download
-    mkdir -p /opt/download
-    cd /opt/download
+    sudo rm -rf /opt/download
+    sudo mkdir -p /opt/download
+    sudo cd /opt/download
 
-    wget $POOL_UPGRADE_URL
-    wget $POOL_UPGRADE_MANIFEST_URL -O manifest.txt
-    wget $POOL_UPGRADE_MANIFEST_SIG_URL -O manifest.txt.sig
+    sudo wget $POOL_UPGRADE_URL
+    sudo wget $POOL_UPGRADE_MANIFEST_URL -O manifest.txt
+    sudo wget $POOL_UPGRADE_MANIFEST_SIG_URL -O manifest.txt.sig
 
-    gpg --verify manifest.txt.sig manifest.txt
+    sudo gpg --verify manifest.txt.sig manifest.txt
     if [ $? == 0 ]; then
         # Install Pool
-        tar -xzf pool-*.tar.gz
-        mv $POOL_ARCH-$POOL_VERSION pool
-        install -m 0755 -o root -g root -t /usr/local/bin pool/*
+        sudo tar -xzf pool-*.tar.gz
+        sudo mv $POOL_ARCH-$POOL_VERSION pool
+        sudo install -m 0755 -o root -g root -t /usr/local/bin pool/*
 
         # Mark current version
-        echo $POOL_VERSION > $POOL_VERSION_FILE
+        sudo echo $POOL_VERSION > $POOL_VERSION_FILE
     else
         echo "ERROR UPGRADING POOL - GPG FAILED"
     fi
@@ -488,23 +488,23 @@ if [ -f $LIT_VERSION_FILE ]; then
 fi
 if [ "$CURRENT" != "$LIT_VERSION" ]; then
     # Download and install lit
-    rm -rf /opt/download
-    mkdir -p /opt/download
-    cd /opt/download
+    sudo rm -rf /opt/download
+    sudo mkdir -p /opt/download
+    sudo cd /opt/download
 
-    wget $LIT_UPGRADE_URL
-    wget $LIT_UPGRADE_MANIFEST_URL -O manifest.txt
-    wget $LIT_UPGRADE_MANIFEST_SIG_URL  -O manifest.txt.sig
+    sudo wget $LIT_UPGRADE_URL
+    sudo wget $LIT_UPGRADE_MANIFEST_URL -O manifest.txt
+    sudo wget $LIT_UPGRADE_MANIFEST_SIG_URL  -O manifest.txt.sig
 
-    gpg --verify manifest.txt.sig manifest.txt
+    sudo gpg --verify manifest.txt.sig manifest.txt
     if [ $? == 0 ]; then
         # Install lit
-        tar -xzf lightning-terminal-*.tar.gz
-        mv $LIT_ARCH-$LIT_VERSION lightning-terminal
-        sudo install -m 0755 -o root -g root -t /usr/local/bin lightning-terminal/lit*
+        sudo tar -xzf lightning-terminal-*.tar.gz
+        sudo mv $LIT_ARCH-$LIT_VERSION lightning-terminal
+        sudo sudo install -m 0755 -o root -g root -t /usr/local/bin lightning-terminal/lit*
 
         # Mark current version
-        echo $LIT_VERSION > $LIT_VERSION_FILE
+        sudo echo $LIT_VERSION > $LIT_VERSION_FILE
     else
         echo "ERROR UPGRADING LIT - GPG FAILED"
     fi
@@ -527,25 +527,22 @@ if [ -f $LNDHUB_VERSION_FILE ]; then
     CURRENT=$(cat $LNDHUB_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$LNDHUB_VERSION" ]; then
-    cd /opt/mynode
-    rm -rf LndHub
+    sudo cd /opt/mynode
+    sudo rm -rf LndHub
 
-    wget $LNDHUB_UPGRADE_URL
-    tar -xzf ${LNDHUB_VERSION}.tar.gz
-    rm -f ${LNDHUB_VERSION}.tar.gz
-    mv LndHub-* LndHub
-    chown -R bitcoin:bitcoin LndHub
+    sudo wget $LNDHUB_UPGRADE_URL
+    sudo tar -xzf ${LNDHUB_VERSION}.tar.gz
+    sudo rm -f ${LNDHUB_VERSION}.tar.gz
+    sudo mv LndHub-* LndHub
+    sudo chown -R bitcoin:bitcoin LndHub
 
-    cd LndHub
+    sudo cd LndHub
     sudo -u bitcoin npm install --only=production
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/tls.cert tls.cert
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/data/chain/bitcoin/mainnet/admin.macaroon admin.macaroon
-    echo $LNDHUB_VERSION > $LNDHUB_VERSION_FILE
+    sudo echo $LNDHUB_VERSION > $LNDHUB_VERSION_FILE
 fi
 cd ~
-
-# Install Caravan
-# Skip - no longer default app
 
 
 # Install cors proxy (my fork)
@@ -558,18 +555,18 @@ if [ -f $CORSPROXY_VERSION_FILE ]; then
     CURRENT=$(cat $CORSPROXY_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$CORSPROXY_VERSION" ]; then
-    cd /opt/mynode
-    rm -rf corsproxy
+    sudo cd /opt/mynode
+    sudo rm -rf corsproxy
 
-    rm -f corsproxy.tar.gz
-    wget $CORSPROXY_UPGRADE_URL -O corsproxy.tar.gz
-    tar -xzf corsproxy.tar.gz
-    rm -f corsproxy.tar.gz
-    mv CORS-* corsproxy
+    sudo rm -f corsproxy.tar.gz
+    sudo wget $CORSPROXY_UPGRADE_URL -O corsproxy.tar.gz
+    sudo tar -xzf corsproxy.tar.gz
+    sudo rm -f corsproxy.tar.gz
+    sudo mv CORS-* corsproxy
 
-    cd corsproxy
-    npm install
-    echo $CORSPROXY_VERSION > $CORSPROXY_VERSION_FILE
+    sudo cd corsproxy
+    sudo npm install
+    sudo echo $CORSPROXY_VERSION > $CORSPROXY_VERSION_FILE
 fi
 cd ~
 
@@ -579,7 +576,7 @@ echo .
 echo "Installing Electrs..."
 echo .
 
-echo $ELECTRS_VERSION > $ELECTRS_VERSION_FILE
+sudo echo $ELECTRS_VERSION > $ELECTRS_VERSION_FILE
 
 
 # Install recent version of secp256k1
@@ -593,18 +590,18 @@ if [ -f $SECP256K1_VERSION_FILE ]; then
     CURRENT=$(cat $SECP256K1_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$SECP256K1_VERSION" ]; then
-    rm -rf /tmp/secp256k1
-    cd /tmp/
-    git clone https://github.com/bitcoin-core/secp256k1.git
-    cd secp256k1
+    sudo rm -rf /tmp/secp256k1
+    sudo cd /tmp/
+    sudo git clone https://github.com/bitcoin-core/secp256k1.git
+    sudo cd secp256k1
 
-    ./autogen.sh
-    ./configure --enable-module-recovery --disable-jni --enable-experimental --enable-module-ecdh --enable-benchmark=no
-    make "$(($(nproc)))"
+    sudo ./autogen.sh
+    sudo ./configure --enable-module-recovery --disable-jni --enable-experimental --enable-module-ecdh --enable-benchmark=no
+    sudo make "$(($(nproc)))"
     sudo make install
-    cp -f include/* /usr/include/
+    sudo cp -f include/* /usr/include/
 
-    echo $SECP256K1_VERSION > $SECP256K1_VERSION_FILE
+    sudo echo $SECP256K1_VERSION > $SECP256K1_VERSION_FILE
 fi
 
 # Install JoinInBox
@@ -618,18 +615,18 @@ if [ -f $JOININBOX_VERSION_FILE ]; then
 fi
 if [ "$CURRENT" != "$JOININBOX_VERSION" ]; then
     # Download and build JoinInBox
-    cd /home/joinmarket
+    sudo cd /home/joinmarket
 
     # Delete all non-hidden files
-    rm -rf *
-    rm -rf joininbox-*
+    sudo rm -rf *
+    sudo rm -rf joininbox-*
 
     sudo -u joinmarket wget $JOININBOX_UPGRADE_URL -O joininbox.tar.gz
     sudo -u joinmarket tar -xvf joininbox.tar.gz
     sudo -u joinmarket rm joininbox.tar.gz
-    mv joininbox-* joininbox
+    sudo mv joininbox-* joininbox
 
-    chmod -R +x ./joininbox/
+    sudo chmod -R +x ./joininbox/
     sudo -u joinmarket cp -rf ./joininbox/scripts/* .
 
     # Install
@@ -638,7 +635,7 @@ if [ "$CURRENT" != "$JOININBOX_VERSION" ]; then
 
     # Enable obwatcher at the end of setup_device.sh
 
-    echo $JOININBOX_VERSION > $JOININBOX_VERSION_FILE
+    sudo echo $JOININBOX_VERSION > $JOININBOX_VERSION_FILE
 fi
 
 # Install Whirlpool
@@ -652,14 +649,14 @@ if [ -f $WHIRLPOOL_VERSION_FILE ]; then
 fi
 if [ "$CURRENT" != "$WHIRLPOOL_VERSION" ]; then
     sudo -u bitcoin mkdir -p /opt/mynode/whirlpool
-    cd /opt/mynode/whirlpool
+    sudo cd /opt/mynode/whirlpool
     sudo rm -rf *.jar
     sudo -u bitcoin wget -O whirlpool.jar $WHIRLPOOL_UPGRADE_URL
 
-    cp -f $TMP_INSTALL_PATH/usr/share/whirlpool/whirlpool.asc whirlpool.asc
-    gpg --verify whirlpool.asc
+    sudo cp -f $TMP_INSTALL_PATH/usr/share/whirlpool/whirlpool.asc whirlpool.asc
+    sudo gpg --verify whirlpool.asc
 
-    echo $WHIRLPOOL_VERSION > $WHIRLPOOL_VERSION_FILE
+    sudo echo $WHIRLPOOL_VERSION > $WHIRLPOOL_VERSION_FILE
 fi
 
 
@@ -674,10 +671,10 @@ if [ -f $RTL_VERSION_FILE ]; then
     CURRENT=$(cat $RTL_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$RTL_VERSION" ]; then
-    cd /opt/mynode
-    rm -rf RTL
+    sudo cd /opt/mynode
+    sudo rm -rf RTL
 
-    sudo -u bitcoin wget $RTL_UPGRADE_URL -O RTL.tar.gz
+    sudo sudo -u bitcoin wget $RTL_UPGRADE_URL -O RTL.tar.gz
     #sudo -u bitcoin wget $RTL_UPGRADE_ASC_URL -O RTL.tar.gz.asc
 
     #gpg --verify RTL.tar.gz.asc RTL.tar.gz
@@ -685,11 +682,11 @@ if [ "$CURRENT" != "$RTL_VERSION" ]; then
     sudo -u bitcoin tar -xvf RTL.tar.gz
     sudo -u bitcoin rm RTL.tar.gz
     sudo -u bitcoin mv RTL-* RTL
-    cd RTL
+    sudo cd RTL
     sudo -u bitcoin NG_CLI_ANALYTICS=false npm install --only=production --legacy-peer-deps
     sudo -u bitcoin npm install request --save
 
-    echo $RTL_VERSION > $RTL_VERSION_FILE
+    sudo echo $RTL_VERSION > $RTL_VERSION_FILE
 fi
 
 
@@ -703,16 +700,16 @@ if [ -f $BTCRPCEXPLORER_VERSION_FILE ]; then
     CURRENT=$(cat $BTCRPCEXPLORER_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$BTCRPCEXPLORER_VERSION" ]; then
-    cd /opt/mynode
-    rm -rf btc-rpc-explorer
+    sudo cd /opt/mynode
+    sudo rm -rf btc-rpc-explorer
     sudo -u bitcoin wget $BTCRPCEXPLORER_UPGRADE_URL -O btc-rpc-explorer.tar.gz
     sudo -u bitcoin tar -xvf btc-rpc-explorer.tar.gz
     sudo -u bitcoin rm btc-rpc-explorer.tar.gz
     sudo -u bitcoin mv btc-rpc-* btc-rpc-explorer
-    cd btc-rpc-explorer
+    sudo cd btc-rpc-explorer
     sudo -u bitcoin npm install --only=production
 
-    echo $BTCRPCEXPLORER_VERSION > $BTCRPCEXPLORER_VERSION_FILE
+    sudo echo $BTCRPCEXPLORER_VERSION > $BTCRPCEXPLORER_VERSION_FILE
 fi
 
 
@@ -725,22 +722,22 @@ if [ -f $SPECTER_VERSION_FILE ]; then
     CURRENT=$(cat $SPECTER_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$SPECTER_VERSION" ]; then
-    cd /opt/mynode
-    rm -rf specter
-    mkdir -p specter
-    chown -R bitcoin:bitcoin specter
-    cd specter
+    sudo cd /opt/mynode
+    sudo rm -rf specter
+    sudo mkdir -p specter
+    sudo chown -R bitcoin:bitcoin specter
+    sudo cd specter
 
     # Make venv
     if [ ! -d env ]; then
         sudo -u bitcoin python3 -m venv env
     fi
-    source env/bin/activate
-    pip3 install ecdsa===0.13.3
-    pip3 install cryptoadvance.specter===$SPECTER_VERSION --upgrade
-    deactivate
+    sudo source env/bin/activate
+    sudo pip3 install ecdsa===0.13.3
+    sudo pip3 install cryptoadvance.specter===$SPECTER_VERSION --upgrade
+    sudo deactivate
 
-    echo $SPECTER_VERSION > $SPECTER_VERSION_FILE
+    sudo echo $SPECTER_VERSION > $SPECTER_VERSION_FILE
 fi
 
 
@@ -754,26 +751,26 @@ if [ -f $THUNDERHUB_VERSION_FILE ]; then
     CURRENT=$(cat $THUNDERHUB_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$THUNDERHUB_VERSION" ]; then
-    cd /opt/mynode
-    rm -rf thunderhub
+    sudo cd /opt/mynode
+    sudo rm -rf thunderhub
     sudo -u bitcoin wget $THUNDERHUB_UPGRADE_URL -O thunderhub.tar.gz
     sudo -u bitcoin tar -xvf thunderhub.tar.gz
     sudo -u bitcoin rm thunderhub.tar.gz
     sudo -u bitcoin mv thunderhub-* thunderhub
-    cd thunderhub
+    sudo cd thunderhub
 
     # Patch versions
-    sed -i 's/\^5.3.5/5.3.3/g' package.json || true     # Fixes segfault with 5.3.5 on x86
+    sudo sed -i 's/\^5.3.5/5.3.3/g' package.json || true     # Fixes segfault with 5.3.5 on x86
 
     sudo -u bitcoin npm install --legacy-peer-deps # --only=production # (can't build with only production)
     sudo -u bitcoin npm run build
     sudo -u bitcoin npx next telemetry disable
 
     # Setup symlink to service files
-    rm -f /opt/mynode/thunderhub/.env.local
+    sudo rm -f /opt/mynode/thunderhub/.env.local
     sudo ln -s /mnt/hdd/mynode/thunderhub/.env.local /opt/mynode/thunderhub/.env.local
 
-    echo $THUNDERHUB_VERSION > $THUNDERHUB_VERSION_FILE
+    sudo echo $THUNDERHUB_VERSION > $THUNDERHUB_VERSION_FILE
 fi
 
 
@@ -788,16 +785,16 @@ if [ -f $LNDCONNECT_VERSION_FILE ]; then
     CURRENT=$(cat $LNDCONNECT_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$LNDCONNECT_VERSION" ]; then
-    rm -rf /opt/download
-    mkdir -p /opt/download
-    cd /opt/download
-    wget $LNDCONNECT_UPGRADE_URL -O lndconnect.tar.gz
-    tar -xvf lndconnect.tar.gz
-    rm lndconnect.tar.gz
-    mv lndconnect-* lndconnect
-    install -m 0755 -o root -g root -t /usr/local/bin lndconnect/*
+    sudo rm -rf /opt/download
+    sudo mkdir -p /opt/download
+    sudo cd /opt/download
+    sudo wget $LNDCONNECT_UPGRADE_URL -O lndconnect.tar.gz
+    sudo tar -xvf lndconnect.tar.gz
+    sudo rm lndconnect.tar.gz
+    sudo mv lndconnect-* lndconnect
+    sudo install -m 0755 -o root -g root -t /usr/local/bin lndconnect/*
 
-    echo $LNDCONNECT_VERSION > $LNDCONNECT_VERSION_FILE
+    sudo echo $LNDCONNECT_VERSION > $LNDCONNECT_VERSION_FILE
 fi
 
 
@@ -806,12 +803,12 @@ echo .
 echo "Installing ngrok for debugging..."
 echo .
 if [ ! -f /usr/bin/ngrok  ]; then
-    cd /tmp
+    sudo cd /tmp
     NGROK_URL=https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-arm.zip
     NGROK_URL=https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-386.zip
-    wget $NGROK_URL
-    unzip ngrok-*.zip
-    cp ngrok /usr/bin/
+    sudo wget $NGROK_URL
+    sudo unzip ngrok-*.zip
+    sudo cp ngrok /usr/bin/
 fi
 
 # Make sure "Remote Access" apps are marked installed
