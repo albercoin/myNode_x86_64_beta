@@ -49,9 +49,9 @@ sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
 
 # Set DNS for install (new)
-#sudo echo "" >> /etc/dhcp/dhclient.conf
-#sudo echo "append domain-name-servers 1.1.1.1, 8.8.8.8;" >> /etc/dhcp/dhclient.conf
-#sudo dhclient -r
+sudo bash -c "echo '' >> /etc/dhcp/dhclient.conf"
+sudo bash -c "echo 'append domain-name-servers 1.1.1.1, 8.8.8.8;' >> /etc/dhcp/dhclient.conf"
+sudo dhclient -r
 
 
 # Download rootfs
@@ -218,7 +218,7 @@ sudo mkdir -p /var/log/nginx
 $TORIFY sudo apt-get -y install nginx || true
 # Install may fail, so we need to edit the default config file and reconfigure
 sudo rm -f /etc/nginx/modules-enabled/50-mod-* || true
-sudo echo "" > /etc/nginx/sites-available/default
+sudo touch /etc/nginx/sites-available/default
 sudo dpkg --configure -a
 
 
@@ -272,18 +272,18 @@ sudo mkdir -p /etc/apt/keyrings
 
 if [ LINUX == "debian" ]; then
     sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
-    sudo echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-      $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo bash -c "echo \
+      'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+      $(lsb_release -cs) stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null"
     sudo apt-get update --allow-releaseinfo-change
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true
 
 elif [ LINUX == "ubuntu" ]; then
-    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
 
-    sudo echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo bash -c "echo \
+      'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null"
 
     sudo apt-get update --allow-releaseinfo-change
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true 
