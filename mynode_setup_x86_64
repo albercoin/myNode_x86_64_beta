@@ -356,7 +356,7 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
         sudo -u bitcoin ln -s /mnt/hdd/mynode/lnd /home/bitcoin/.lnd
     fi
     sudo mkdir -p /home/admin/.bitcoin
-    echo $BTC_VERSION > BTC_VERSION_FILE
+    BTC_VERSION_FILE=$(echo $BTC_VERSION)
 
     # Install bash-completion for bitcoin-cli
     sudo wget $BTC_CLI_COMPLETION_URL -O bitcoin-cli.bash-completion
@@ -395,7 +395,7 @@ if [ "$CURRENT" != "$LND_VERSION" ]; then
     sudo rm -f /usr/bin/ip
     sudo ln -s /bin/ip /usr/bin/ip || true
 
-    echo $LND_VERSION > LND_VERSION_FILE
+    LND_VERSION_FILE=$(echo $LND_VERSION)
 
     # Download bash-completion file for lncli
     sudo wget $LNCLI_COMPLETION_URL
@@ -437,7 +437,7 @@ if [ "$CURRENT" != "$LOOP_VERSION" ]; then
         sudo install -m 0755 -o root -g root -t /usr/local/bin loop/*
 
         # Mark current version
-        echo $LOOP_VERSION > LOOP_VERSION_FILE
+        LOOP_VERSION_FILE=$(echo $LOOP_VERSION)
     else
         echo "ERROR UPGRADING LND - GPG FAILED"
     fi
@@ -472,7 +472,7 @@ if [ "$CURRENT" != "$POOL_VERSION" ]; then
         sudo install -m 0755 -o root -g root -t /usr/local/bin pool/*
 
         # Mark current version
-        echo $POOL_VERSION > POOL_VERSION_FILE
+        POOL_VERSION_FILE=$(echo $POOL_VERSION)
     else
         echo "ERROR UPGRADING POOL - GPG FAILED"
     fi
@@ -507,7 +507,7 @@ if [ "$CURRENT" != "$LIT_VERSION" ]; then
         sudo sudo install -m 0755 -o root -g root -t /usr/local/bin lightning-terminal/lit*
 
         # Mark current version
-        echo $LIT_VERSION > LIT_VERSION_FILE
+        LIT_VERSION_FILE=$(echo $LIT_VERSION)
     else
         echo "ERROR UPGRADING LIT - GPG FAILED"
     fi
@@ -545,7 +545,8 @@ if [ "$CURRENT" != "$LNDHUB_VERSION" ]; then
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/tls.cert tls.cert
     sudo rm -f admin.macaroon
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/data/chain/bitcoin/mainnet/admin.macaroon admin.macaroon
-    echo $LNDHUB_VERSION > LNDHUB_VERSION_FILE
+    
+    LNDHUB_VERSION_FILE=$(echo $LNDHUB_VERSION)
 fi
 cd ~
 
@@ -571,7 +572,7 @@ if [ "$CURRENT" != "$CORSPROXY_VERSION" ]; then
 
     cd corsproxy
     sudo npm install
-    echo $CORSPROXY_VERSION > CORSPROXY_VERSION_FILE
+    CORSPROXY_VERSION_FILE=$(echo $CORSPROXY_VERSION)
 fi
 cd ~
 
@@ -581,7 +582,7 @@ echo .
 echo "Installing Electrs..."
 echo .
 
-echo $ELECTRS_VERSION > ELECTRS_VERSION_FILE
+ELECTRS_VERSION_FILE=$(echo $ELECTRS_VERSION)
 
 
 # Install recent version of secp256k1
@@ -606,7 +607,7 @@ if [ "$CURRENT" != "$SECP256K1_VERSION" ]; then
     sudo make install
     sudo cp -f include/* /usr/include/
 
-    echo $SECP256K1_VERSION > SECP256K1_VERSION_FILE
+    SECP256K1_VERSION_FILE=$(echo $SECP256K1_VERSION)
 fi
 
 # Install JoinInBox
@@ -640,7 +641,7 @@ if [ "$CURRENT" != "$JOININBOX_VERSION" ]; then
 
     # Enable obwatcher at the end of setup_device.sh
 
-    echo $JOININBOX_VERSION > JOININBOX_VERSION_FILE
+    JOININBOX_VERSION_FILE=$(echo $JOININBOX_VERSION)
 fi
 
 # Install Whirlpool
@@ -661,7 +662,7 @@ if [ "$CURRENT" != "$WHIRLPOOL_VERSION" ]; then
     sudo cp -f $TMP_INSTALL_PATH/usr/share/whirlpool/whirlpool.asc whirlpool.asc
     sudo gpg --verify whirlpool.asc
 
-    echo $WHIRLPOOL_VERSION > WHIRLPOOL_VERSION_FILE
+    WHIRLPOOL_VERSION_FILE=$(echo $WHIRLPOOL_VERSION)
 fi
 
 
@@ -691,7 +692,7 @@ if [ "$CURRENT" != "$RTL_VERSION" ]; then
     sudo -u bitcoin NG_CLI_ANALYTICS=false npm install --only=production --legacy-peer-deps
     sudo -u bitcoin npm install request --save
 
-    echo $RTL_VERSION > RTL_VERSION_FILE
+    RTL_VERSION_FILE=$(echo $RTL_VERSION)
 fi
 
 
@@ -714,7 +715,7 @@ if [ "$CURRENT" != "$BTCRPCEXPLORER_VERSION" ]; then
     cd btc-rpc-explorer
     sudo -u bitcoin npm install --only=production
 
-    echo $BTCRPCEXPLORER_VERSION > BTCRPCEXPLORER_VERSION_FILE
+    BTCRPCEXPLORER_VERSION_FILE=$(echo $BTCRPCEXPLORER_VERSION)
 fi
 
 
@@ -742,7 +743,7 @@ if [ "$CURRENT" != "$SPECTER_VERSION" ]; then
     sudo pip3 install cryptoadvance.specter===$SPECTER_VERSION --upgrade
     sudo deactivate
 
-    echo $SPECTER_VERSION > SPECTER_VERSION_FILE
+    SPECTER_VERSION_FILE=$(echo $SPECTER_VERSION)
 fi
 
 
@@ -775,7 +776,7 @@ if [ "$CURRENT" != "$THUNDERHUB_VERSION" ]; then
     sudo rm -f /opt/mynode/thunderhub/.env.local
     sudo ln -s /mnt/hdd/mynode/thunderhub/.env.local /opt/mynode/thunderhub/.env.local
 
-    echo $THUNDERHUB_VERSION > THUNDERHUB_VERSION_FILE
+    THUNDERHUB_VERSION_FILE=$(echo $THUNDERHUB_VERSION)
 fi
 
 
@@ -799,7 +800,7 @@ if [ "$CURRENT" != "$LNDCONNECT_VERSION" ]; then
     sudo mv lndconnect-* lndconnect
     sudo install -m 0755 -o root -g root -t /usr/local/bin lndconnect/*
 
-    echo $LNDCONNECT_VERSION > LNDCONNECT_VERSION_FILE
+    LNDCONNECT_VERSION_FILE=$(echo $LNDCONNECT_VERSION)
 fi
 
 
