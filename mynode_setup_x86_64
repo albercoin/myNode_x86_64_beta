@@ -49,9 +49,9 @@ sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
 
 
 # Set DNS for install (new)
-sudo echo "" >> /etc/dhcp/dhclient.conf
-sudo echo "append domain-name-servers 1.1.1.1, 8.8.8.8;" >> /etc/dhcp/dhclient.conf
-sudo dhclient -r
+#sudo echo "" >> /etc/dhcp/dhclient.conf
+#sudo echo "append domain-name-servers 1.1.1.1, 8.8.8.8;" >> /etc/dhcp/dhclient.conf
+#sudo dhclient -r
 
 
 # Download rootfs
