@@ -235,13 +235,13 @@ sudo bash -c "grep 'joinmarket' /etc/sudoers || (echo 'joinmarket ALL=(ALL) NOPA
 CURRENT_PYTHON3_VERSION=$(python3 --version)
 if [[ "$CURRENT_PYTHON3_VERSION" != *"Python ${PYTHON_VERSION}"* ]]; then
     sudo mkdir -p /opt/download
-    sudo cd /opt/download
+    cd /opt/download
     sudo rm -rf Python-*
 
     sudo wget https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz -O python.tar.xz
     sudo tar xf python.tar.xz
 
-    sudo cd Python-*
+    cd Python-*
     sudo ./configure
     sudo make -j "$(($(nproc)))"
     sudo make install
@@ -334,7 +334,7 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     # Download and install Bitcoin
     sudo rm -rf /opt/download
     sudo mkdir -p /opt/download
-    sudo cd /opt/download
+    cd /opt/download
 
     sudo wget $BTC_UPGRADE_URL
     sudo wget $BTC_UPGRADE_SHA256SUM_URL -O SHA256SUMS
@@ -377,7 +377,7 @@ fi
 if [ "$CURRENT" != "$LND_VERSION" ]; then
     sudo rm -rf /opt/download
     sudo mkdir -p /opt/download
-    sudo cd /opt/download
+    cd /opt/download
 
     sudo wget $LND_UPGRADE_URL
     sudo wget $LND_UPGRADE_MANIFEST_URL -O manifest.txt
@@ -420,7 +420,7 @@ if [ "$CURRENT" != "$LOOP_VERSION" ]; then
     # Download and install Loop
     sudo rm -rf /opt/download
     sudo mkdir -p /opt/download
-    sudo cd /opt/download
+    cd /opt/download
 
     sudo wget $LOOP_UPGRADE_URL
     sudo wget $LOOP_UPGRADE_MANIFEST_URL -O manifest.txt
@@ -455,7 +455,7 @@ if [ "$CURRENT" != "$POOL_VERSION" ]; then
     # Download and install pool
     sudo rm -rf /opt/download
     sudo mkdir -p /opt/download
-    sudo cd /opt/download
+    cd /opt/download
 
     sudo wget $POOL_UPGRADE_URL
     sudo wget $POOL_UPGRADE_MANIFEST_URL -O manifest.txt
@@ -490,7 +490,7 @@ if [ "$CURRENT" != "$LIT_VERSION" ]; then
     # Download and install lit
     sudo rm -rf /opt/download
     sudo mkdir -p /opt/download
-    sudo cd /opt/download
+    cd /opt/download
 
     sudo wget $LIT_UPGRADE_URL
     sudo wget $LIT_UPGRADE_MANIFEST_URL -O manifest.txt
@@ -527,7 +527,7 @@ if [ -f $LNDHUB_VERSION_FILE ]; then
     CURRENT=$(cat $LNDHUB_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$LNDHUB_VERSION" ]; then
-    sudo cd /opt/mynode
+    cd /opt/mynode
     sudo rm -rf LndHub
 
     sudo wget $LNDHUB_UPGRADE_URL
@@ -536,7 +536,7 @@ if [ "$CURRENT" != "$LNDHUB_VERSION" ]; then
     sudo mv LndHub-* LndHub
     sudo chown -R bitcoin:bitcoin LndHub
 
-    sudo cd LndHub
+    cd LndHub
     sudo -u bitcoin npm install --only=production
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/tls.cert tls.cert
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/data/chain/bitcoin/mainnet/admin.macaroon admin.macaroon
@@ -555,7 +555,7 @@ if [ -f $CORSPROXY_VERSION_FILE ]; then
     CURRENT=$(cat $CORSPROXY_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$CORSPROXY_VERSION" ]; then
-    sudo cd /opt/mynode
+    cd /opt/mynode
     sudo rm -rf corsproxy
 
     sudo rm -f corsproxy.tar.gz
@@ -564,7 +564,7 @@ if [ "$CURRENT" != "$CORSPROXY_VERSION" ]; then
     sudo rm -f corsproxy.tar.gz
     sudo mv CORS-* corsproxy
 
-    sudo cd corsproxy
+    cd corsproxy
     sudo npm install
     sudo echo $CORSPROXY_VERSION > $CORSPROXY_VERSION_FILE
 fi
@@ -591,9 +591,9 @@ if [ -f $SECP256K1_VERSION_FILE ]; then
 fi
 if [ "$CURRENT" != "$SECP256K1_VERSION" ]; then
     sudo rm -rf /tmp/secp256k1
-    sudo cd /tmp/
+    cd /tmp/
     sudo git clone https://github.com/bitcoin-core/secp256k1.git
-    sudo cd secp256k1
+    cd secp256k1
 
     sudo ./autogen.sh
     sudo ./configure --enable-module-recovery --disable-jni --enable-experimental --enable-module-ecdh --enable-benchmark=no
@@ -615,7 +615,7 @@ if [ -f $JOININBOX_VERSION_FILE ]; then
 fi
 if [ "$CURRENT" != "$JOININBOX_VERSION" ]; then
     # Download and build JoinInBox
-    sudo cd /home/joinmarket
+    cd /home/joinmarket
 
     # Delete all non-hidden files
     sudo rm -rf *
@@ -649,7 +649,7 @@ if [ -f $WHIRLPOOL_VERSION_FILE ]; then
 fi
 if [ "$CURRENT" != "$WHIRLPOOL_VERSION" ]; then
     sudo -u bitcoin mkdir -p /opt/mynode/whirlpool
-    sudo cd /opt/mynode/whirlpool
+    cd /opt/mynode/whirlpool
     sudo rm -rf *.jar
     sudo -u bitcoin wget -O whirlpool.jar $WHIRLPOOL_UPGRADE_URL
 
@@ -671,7 +671,7 @@ if [ -f $RTL_VERSION_FILE ]; then
     CURRENT=$(cat $RTL_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$RTL_VERSION" ]; then
-    sudo cd /opt/mynode
+    cd /opt/mynode
     sudo rm -rf RTL
 
     sudo sudo -u bitcoin wget $RTL_UPGRADE_URL -O RTL.tar.gz
@@ -682,7 +682,7 @@ if [ "$CURRENT" != "$RTL_VERSION" ]; then
     sudo -u bitcoin tar -xvf RTL.tar.gz
     sudo -u bitcoin rm RTL.tar.gz
     sudo -u bitcoin mv RTL-* RTL
-    sudo cd RTL
+    cd RTL
     sudo -u bitcoin NG_CLI_ANALYTICS=false npm install --only=production --legacy-peer-deps
     sudo -u bitcoin npm install request --save
 
@@ -700,13 +700,13 @@ if [ -f $BTCRPCEXPLORER_VERSION_FILE ]; then
     CURRENT=$(cat $BTCRPCEXPLORER_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$BTCRPCEXPLORER_VERSION" ]; then
-    sudo cd /opt/mynode
+    cd /opt/mynode
     sudo rm -rf btc-rpc-explorer
     sudo -u bitcoin wget $BTCRPCEXPLORER_UPGRADE_URL -O btc-rpc-explorer.tar.gz
     sudo -u bitcoin tar -xvf btc-rpc-explorer.tar.gz
     sudo -u bitcoin rm btc-rpc-explorer.tar.gz
     sudo -u bitcoin mv btc-rpc-* btc-rpc-explorer
-    sudo cd btc-rpc-explorer
+    cd btc-rpc-explorer
     sudo -u bitcoin npm install --only=production
 
     sudo echo $BTCRPCEXPLORER_VERSION > $BTCRPCEXPLORER_VERSION_FILE
@@ -722,11 +722,11 @@ if [ -f $SPECTER_VERSION_FILE ]; then
     CURRENT=$(cat $SPECTER_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$SPECTER_VERSION" ]; then
-    sudo cd /opt/mynode
+    cd /opt/mynode
     sudo rm -rf specter
     sudo mkdir -p specter
     sudo chown -R bitcoin:bitcoin specter
-    sudo cd specter
+    cd specter
 
     # Make venv
     if [ ! -d env ]; then
@@ -751,13 +751,13 @@ if [ -f $THUNDERHUB_VERSION_FILE ]; then
     CURRENT=$(cat $THUNDERHUB_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$THUNDERHUB_VERSION" ]; then
-    sudo cd /opt/mynode
+    cd /opt/mynode
     sudo rm -rf thunderhub
     sudo -u bitcoin wget $THUNDERHUB_UPGRADE_URL -O thunderhub.tar.gz
     sudo -u bitcoin tar -xvf thunderhub.tar.gz
     sudo -u bitcoin rm thunderhub.tar.gz
     sudo -u bitcoin mv thunderhub-* thunderhub
-    sudo cd thunderhub
+    cd thunderhub
 
     # Patch versions
     sudo sed -i 's/\^5.3.5/5.3.3/g' package.json || true     # Fixes segfault with 5.3.5 on x86
@@ -787,7 +787,7 @@ fi
 if [ "$CURRENT" != "$LNDCONNECT_VERSION" ]; then
     sudo rm -rf /opt/download
     sudo mkdir -p /opt/download
-    sudo cd /opt/download
+    cd /opt/download
     sudo wget $LNDCONNECT_UPGRADE_URL -O lndconnect.tar.gz
     sudo tar -xvf lndconnect.tar.gz
     sudo rm lndconnect.tar.gz
@@ -803,7 +803,7 @@ echo .
 echo "Installing ngrok for debugging..."
 echo .
 if [ ! -f /usr/bin/ngrok  ]; then
-    sudo cd /tmp
+    cd /tmp
     NGROK_URL=https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-arm.zip
     NGROK_URL=https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-386.zip
     sudo wget $NGROK_URL
