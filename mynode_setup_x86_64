@@ -114,11 +114,11 @@ sudo apt-get -y install apt-transport-https curl gnupg ca-certificates
 
 # tor project
 if [ $IS_64_BIT = 1 ]; then
-    sudo grep -qxF "deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || echo "deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" >> /etc/apt/sources.list
-    sudo grep -qxF "deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || echo "deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" >> /etc/apt/sources.list
+    sudo grep -qxF "deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || sudo bash -c "echo 'deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main' >> /etc/apt/sources.list"
+    sudo grep -qxF "deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || sudo bash -c "echo 'deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main' >> /etc/apt/sources.list"
 fi
 if [ "$DEBIAN_VERSION" = "buster" ]; then
-    sudo grep -qxF "deb http://deb.debian.org/debian buster-backports main" /etc/apt/sources.list  || echo "deb http://deb.debian.org/debian buster-backports main" >> /etc/apt/sources.list
+    sudo grep -qxF "deb http://deb.debian.org/debian buster-backports main" /etc/apt/sources.list  || sudo bash -c "echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list"
 fi
 
 # Add I2P Repo
@@ -625,12 +625,12 @@ if [ "$CURRENT" != "$JOININBOX_VERSION" ]; then
 
     # Download and build JoinInBox
     sudo -u joinmarket wget $JOININBOX_UPGRADE_URL -O /home/joinmarket/joininbox.tar.gz
-    sudo -u joinmarket tar -xvf /home/joinmarket/joininbox.tar.gz
+    sudo -u joinmarket tar -xvf /home/joinmarket/joininbox.tar.gz -C /home/joinmarket/
     sudo -u joinmarket rm /home/joinmarket/joininbox.tar.gz
-    sudo mv /home/joinmarket/joininbox-* /home/joinmarket/joininbox
+    sudo -u joinmarket bash -c "mv /home/joinmarket/joininbox-* /home/joinmarket/joininbox"
 
-    sudo chmod -R +x /home/joinmarket/joininbox/
-    sudo -u joinmarket cp -rf /home/joinmarket/joininbox/scripts/* .
+    sudo -u joinmarket chmod -R +x /home/joinmarket/joininbox/
+    sudo -u joinmarket bash -c "cp -rf /home/joinmarket/joininbox/scripts/* /home/joinmarket/"
 
     # Install
     sudo -u joinmarket bash -c "cd /home/joinmarket/; ${JM_ENV_VARS} ./install.joinmarket.sh --install install" || true
@@ -651,12 +651,11 @@ if [ -f $WHIRLPOOL_VERSION_FILE ]; then
     CURRENT=$(cat $WHIRLPOOL_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$WHIRLPOOL_VERSION" ]; then
-    sudo -u bitcoin mkdir -p /opt/mynode/whirlpool
-    cd /opt/mynode/whirlpool
+    sudo -u bitcoin mkdir -p /opt/mynode/whirlpool    
     sudo rm -rf *.jar
     sudo -u bitcoin wget -O whirlpool.jar $WHIRLPOOL_UPGRADE_URL
 
-    sudo cp -f $TMP_INSTALL_PATH/usr/share/whirlpool/whirlpool.asc whirlpool.asc
+    sudo -u bitcoin cp -f $TMP_INSTALL_PATH/usr/share/whirlpool/whirlpool.asc /opt/mynode/whirlpool/whirlpool.asc
     sudo gpg --verify whirlpool.asc
 
     WHIRLPOOL_VERSION_FILE=$(echo $WHIRLPOOL_VERSION)
