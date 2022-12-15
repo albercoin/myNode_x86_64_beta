@@ -617,6 +617,7 @@ if [ "$CURRENT" != "$SECP256K1_VERSION" ]; then
     sudo make -j "$(($(nproc)))"
     sudo make install
     sudo cp -f include/* /usr/include/
+    sudo rm -rf /tmp/secp256k1
     cd
 
     SECP256K1_VERSION_FILE=$(echo $SECP256K1_VERSION)
@@ -825,12 +826,14 @@ echo .
 echo "Installing ngrok for debugging..."
 echo .
 if [ ! -f /usr/bin/ngrok  ]; then
-    cd /tmp
+    sudo rm -rf /tmp/ngrok
+    sudo mkdir -p /tmp/ngrok
+    cd /tmp/ngrok
     NGROK_URL=https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-386.zip
     sudo wget $NGROK_URL
     sudo unzip ngrok-*.zip
     sudo cp ngrok /usr/bin/
-    sudo rm -rf /tmp/*
+    sudo rm -rf /tmp/ngrok
     cd
 fi
 
