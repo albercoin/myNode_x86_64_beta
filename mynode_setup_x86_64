@@ -753,7 +753,7 @@ if [ "$CURRENT" != "$SPECTER_VERSION" ]; then
     source env/bin/activate
     sudo pip3 install ecdsa===0.13.3
     sudo pip3 install cryptoadvance.specter===$SPECTER_VERSION --upgrade
-    sudo deactivate
+    deactivate
     cd
 
     SPECTER_VERSION_FILE=$(echo $SPECTER_VERSION)
