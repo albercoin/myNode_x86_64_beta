@@ -786,8 +786,8 @@ if [ "$CURRENT" != "$THUNDERHUB_VERSION" ]; then
     sudo -u bitcoin npx next telemetry disable
 
     # Setup symlink to service files
-    sudo rm -f thunderhub/.env.local
-    sudo ln -s /mnt/hdd/mynode/thunderhub/.env.local thunderhub/.env.local
+    sudo rm -f .env.local
+    sudo ln -s /mnt/hdd/mynode/thunderhub/.env.local .env.local
     cd
 
     THUNDERHUB_VERSION_FILE=$(echo $THUNDERHUB_VERSION)
@@ -814,6 +814,7 @@ if [ "$CURRENT" != "$LNDCONNECT_VERSION" ]; then
     sudo mv lndconnect-* lndconnect
     sudo install -m 0755 -o root -g root -t /usr/local/bin lndconnect/*
     sudo rm -rf /opt/download/*
+    cd
 
     LNDCONNECT_VERSION_FILE=$(echo $LNDCONNECT_VERSION)
 fi
@@ -830,6 +831,7 @@ if [ ! -f /usr/bin/ngrok  ]; then
     sudo unzip ngrok-*.zip
     sudo cp ngrok /usr/bin/
     sudo rm -rf /tmp/*
+    cd
 fi
 
 # Make sure "Remote Access" apps are marked installed
