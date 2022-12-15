@@ -5,9 +5,9 @@
 ### Run with "sudo"
 ###
 
-echo .
-echo " *** myNode install ***
-echo .
+echo 
+echo *** myNode install ***
+echo 
 
 sleep 1
 sudo -v
