@@ -351,18 +351,18 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
         sudo rm -f /home/bitcoin/.bitcoin
         sudo -u bitcoin ln -s /mnt/hdd/mynode/bitcoin /home/bitcoin/.bitcoin
     fi
-    if [ ! -L /home/bitcoin/.lnd ]; then
-        sudo rm -f /home/bitcoin/.lnd
-        sudo -u bitcoin ln -s /mnt/hdd/mynode/lnd /home/bitcoin/.lnd
-    fi
+    
     sudo mkdir -p /home/admin/.bitcoin
     BTC_VERSION_FILE=$(echo $BTC_VERSION)
 
     # Install bash-completion for bitcoin-cli
     sudo wget $BTC_CLI_COMPLETION_URL -O bitcoin-cli.bash-completion
     sudo cp bitcoin-cli.bash-completion /etc/bash_completion.d/bitcoin-cli
+    
+    sudo rm -rf /opt/download/*
+    cd
 fi
-cd ~
+
 
 # Install Lightning
 echo .
@@ -372,7 +372,6 @@ LND_ARCH="lnd-linux-amd64"
 LND_UPGRADE_URL=https://github.com/lightningnetwork/lnd/releases/download/$LND_VERSION/$LND_ARCH-$LND_VERSION.tar.gz
 LNCLI_COMPLETION_URL=https://raw.githubusercontent.com/lightningnetwork/lnd/$LND_VERSION/contrib/lncli.bash-completion
 CURRENT=""
-
 if [ -f $LND_VERSION_FILE ]; then
     CURRENT=$(cat $LND_VERSION_FILE)
 fi
@@ -392,6 +391,10 @@ if [ "$CURRENT" != "$LND_VERSION" ]; then
     sudo tar -xzf lnd-*.tar.gz
     sudo mv $LND_ARCH-$LND_VERSION lnd
     sudo install -m 0755 -o root -g root -t /usr/local/bin lnd/*
+    if [ ! -L /home/bitcoin/.lnd ]; then
+        sudo rm -f /home/bitcoin/.lnd
+        sudo -u bitcoin ln -s /mnt/hdd/mynode/lnd /home/bitcoin/.lnd
+    fi
     sudo rm -f /usr/bin/ip
     sudo ln -s /bin/ip /usr/bin/ip || true
 
@@ -400,20 +403,18 @@ if [ "$CURRENT" != "$LND_VERSION" ]; then
     # Download bash-completion file for lncli
     sudo wget $LNCLI_COMPLETION_URL
     sudo sudo cp lncli.bash-completion /etc/bash_completion.d/lncli
+    
+    sudo rm -rf /opt/download/*
+    cd
 fi
-cd ~
+
 
 # Install Loop
 echo .
 echo "Installing loop..."
 echo .
-LOOP_ARCH="loop-linux-armv7"
-if [ $IS_X86 = 1 ]; then
-    LOOP_ARCH="loop-linux-amd64"
-fi
-if [ $IS_RASPI4_ARM64 = 1 ]; then
-    LOOP_ARCH="loop-linux-arm64"
-fi
+
+LOOP_ARCH="loop-linux-amd64"
 LOOP_UPGRADE_URL=https://github.com/lightninglabs/loop/releases/download/$LOOP_VERSION/$LOOP_ARCH-$LOOP_VERSION.tar.gz
 CURRENT=""
 if [ -f $LOOP_VERSION_FILE ]; then
@@ -430,7 +431,8 @@ if [ "$CURRENT" != "$LOOP_VERSION" ]; then
     sudo wget $LOOP_UPGRADE_MANIFEST_SIG_URL -O manifest.txt.sig
 
     sudo gpg --verify manifest.txt.sig manifest.txt
-    if [ $? == 0 ]; then
+    VAL=$?
+    if [ $VAL == 0 ]; then
         # Install Loop
         sudo tar -xzf loop-*.tar.gz
         sudo mv $LOOP_ARCH-$LOOP_VERSION loop
@@ -441,6 +443,8 @@ if [ "$CURRENT" != "$LOOP_VERSION" ]; then
     else
         echo "ERROR UPGRADING LND - GPG FAILED"
     fi
+    sudo rm -rf /opt/download/*
+    cd
 fi
 
 # Install Pool
@@ -465,7 +469,8 @@ if [ "$CURRENT" != "$POOL_VERSION" ]; then
     sudo wget $POOL_UPGRADE_MANIFEST_SIG_URL -O manifest.txt.sig
 
     sudo gpg --verify manifest.txt.sig manifest.txt
-    if [ $? == 0 ]; then
+    VAL=$?
+    if [ $VAL == 0 ]; then
         # Install Pool
         sudo tar -xzf pool-*.tar.gz
         sudo mv $POOL_ARCH-$POOL_VERSION pool
@@ -476,6 +481,8 @@ if [ "$CURRENT" != "$POOL_VERSION" ]; then
     else
         echo "ERROR UPGRADING POOL - GPG FAILED"
     fi
+    sudo rm -rf /opt/download/*
+    cd
 fi
 
 # Install Lightning Terminal
@@ -500,7 +507,8 @@ if [ "$CURRENT" != "$LIT_VERSION" ]; then
     sudo wget $LIT_UPGRADE_MANIFEST_SIG_URL  -O manifest.txt.sig
 
     sudo gpg --verify manifest.txt.sig manifest.txt
-    if [ $? == 0 ]; then
+    VAL=$?
+    if [ $VAL == 0 ]; then
         # Install lit
         sudo tar -xzf lightning-terminal-*.tar.gz
         sudo mv $LIT_ARCH-$LIT_VERSION lightning-terminal
@@ -511,8 +519,10 @@ if [ "$CURRENT" != "$LIT_VERSION" ]; then
     else
         echo "ERROR UPGRADING LIT - GPG FAILED"
     fi
+    sudo rm -rf /opt/download/*
+    cd
 fi
-cd ~
+
 
 
 # Setup "install" location for some apps
@@ -545,6 +555,7 @@ if [ "$CURRENT" != "$LNDHUB_VERSION" ]; then
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/tls.cert tls.cert
     sudo rm -f admin.macaroon
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/data/chain/bitcoin/mainnet/admin.macaroon admin.macaroon
+    cd
     
     LNDHUB_VERSION_FILE=$(echo $LNDHUB_VERSION)
 fi
@@ -572,9 +583,9 @@ if [ "$CURRENT" != "$CORSPROXY_VERSION" ]; then
 
     cd corsproxy
     sudo npm install
+    cd
     CORSPROXY_VERSION_FILE=$(echo $CORSPROXY_VERSION)
 fi
-cd ~
 
 
 # Install Electrs (just mark version, now included in overlay)
@@ -606,6 +617,7 @@ if [ "$CURRENT" != "$SECP256K1_VERSION" ]; then
     sudo make -j "$(($(nproc)))"
     sudo make install
     sudo cp -f include/* /usr/include/
+    cd
 
     SECP256K1_VERSION_FILE=$(echo $SECP256K1_VERSION)
 fi
@@ -638,6 +650,8 @@ if [ "$CURRENT" != "$JOININBOX_VERSION" ]; then
 
     # Enable obwatcher at the end of setup_device.sh
 
+    cd
+    
     JOININBOX_VERSION_FILE=$(echo $JOININBOX_VERSION)
 fi
 
@@ -651,12 +665,14 @@ if [ -f $WHIRLPOOL_VERSION_FILE ]; then
     CURRENT=$(cat $WHIRLPOOL_VERSION_FILE)
 fi
 if [ "$CURRENT" != "$WHIRLPOOL_VERSION" ]; then
-    sudo -u bitcoin mkdir -p /opt/mynode/whirlpool    
+    sudo -u bitcoin mkdir -p /opt/mynode/whirlpool
+    cd /opt/mynode/whirlpool
     sudo rm -rf *.jar
     sudo -u bitcoin wget -O whirlpool.jar $WHIRLPOOL_UPGRADE_URL
 
     sudo -u bitcoin cp -f $TMP_INSTALL_PATH/usr/share/whirlpool/whirlpool.asc /opt/mynode/whirlpool/whirlpool.asc
     sudo gpg --verify whirlpool.asc
+    cd
 
     WHIRLPOOL_VERSION_FILE=$(echo $WHIRLPOOL_VERSION)
 fi
@@ -675,10 +691,8 @@ fi
 if [ "$CURRENT" != "$RTL_VERSION" ]; then
     cd /opt/mynode
     sudo rm -rf RTL
-
     sudo -u bitcoin wget $RTL_UPGRADE_URL -O RTL.tar.gz
     #sudo -u bitcoin wget $RTL_UPGRADE_ASC_URL -O RTL.tar.gz.asc
-
     #gpg --verify RTL.tar.gz.asc RTL.tar.gz
 
     sudo -u bitcoin tar -xvf RTL.tar.gz
@@ -687,6 +701,7 @@ if [ "$CURRENT" != "$RTL_VERSION" ]; then
     cd RTL
     sudo -u bitcoin NG_CLI_ANALYTICS=false npm install --only=production --legacy-peer-deps
     sudo -u bitcoin npm install request --save
+    cd
 
     RTL_VERSION_FILE=$(echo $RTL_VERSION)
 fi
@@ -710,6 +725,7 @@ if [ "$CURRENT" != "$BTCRPCEXPLORER_VERSION" ]; then
     sudo -u bitcoin mv btc-rpc-* btc-rpc-explorer
     cd btc-rpc-explorer
     sudo -u bitcoin npm install --only=production
+    cd
 
     BTCRPCEXPLORER_VERSION_FILE=$(echo $BTCRPCEXPLORER_VERSION)
 fi
@@ -738,6 +754,7 @@ if [ "$CURRENT" != "$SPECTER_VERSION" ]; then
     sudo pip3 install ecdsa===0.13.3
     sudo pip3 install cryptoadvance.specter===$SPECTER_VERSION --upgrade
     sudo deactivate
+    cd
 
     SPECTER_VERSION_FILE=$(echo $SPECTER_VERSION)
 fi
@@ -769,8 +786,9 @@ if [ "$CURRENT" != "$THUNDERHUB_VERSION" ]; then
     sudo -u bitcoin npx next telemetry disable
 
     # Setup symlink to service files
-    sudo rm -f /opt/mynode/thunderhub/.env.local
-    sudo ln -s /mnt/hdd/mynode/thunderhub/.env.local /opt/mynode/thunderhub/.env.local
+    sudo rm -f thunderhub/.env.local
+    sudo ln -s /mnt/hdd/mynode/thunderhub/.env.local thunderhub/.env.local
+    cd
 
     THUNDERHUB_VERSION_FILE=$(echo $THUNDERHUB_VERSION)
 fi
@@ -795,6 +813,7 @@ if [ "$CURRENT" != "$LNDCONNECT_VERSION" ]; then
     sudo rm lndconnect.tar.gz
     sudo mv lndconnect-* lndconnect
     sudo install -m 0755 -o root -g root -t /usr/local/bin lndconnect/*
+    sudo rm -rf /opt/download/*
 
     LNDCONNECT_VERSION_FILE=$(echo $LNDCONNECT_VERSION)
 fi
@@ -806,11 +825,11 @@ echo "Installing ngrok for debugging..."
 echo .
 if [ ! -f /usr/bin/ngrok  ]; then
     cd /tmp
-    NGROK_URL=https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-arm.zip
     NGROK_URL=https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-386.zip
     sudo wget $NGROK_URL
     sudo unzip ngrok-*.zip
     sudo cp ngrok /usr/bin/
+    sudo rm -rf /tmp/*
 fi
 
 # Make sure "Remote Access" apps are marked installed
