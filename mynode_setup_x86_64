@@ -5,9 +5,9 @@
 ### Run with "sudo"
 ###
 
-echo 
-echo *** myNode install ***
-echo 
+echo "*****************************"
+echo "*** myNode x86_64 install ***"
+echo "*****************************"
 
 sleep 1
 sudo -v
@@ -17,16 +17,15 @@ set -e
 
 # Usage: $0 <ip address | online>
 if [ "$#" != "1" ]; then
-    echo "myNode ONLINE..."
+    echo "Install ONLINE..."
     SERVER_IP=online
 else
-    echo "myNode IP ADDRESS..."
+    echo "Install IP ADDRESS... " $1
     SERVER_IP=$1
 fi
 
-sudo apt -y install lsb-release
-
 # Determine Device
+sudo apt install lsb-release
 
 IS_X86=0
 IS_32_BIT=0
@@ -38,9 +37,7 @@ if [ $LINUX == "pop" ]; then
     LINUX="ubuntu"
 fi   
 DEBIAN_VERSION=$(lsb_release -c -s) || DEBIAN_VERSION="unknown"
-
 uname -a | grep x86_64 && IS_X86=1 && IS_64_BIT=1 && IS_UNKNOWN=0 || true
-
 if [ $IS_UNKNOWN = 1 ]; then
     echo "UNKNOWN DEVICE TYPE"
     exit 1
@@ -89,9 +86,6 @@ sudo cp -f /tmp/upgrade/out/rootfs_*/usr/bin/mynode-get-device-serial /usr/bin/m
 # Source file containing app versions
 source /tmp/upgrade/out/rootfs_*/usr/share/mynode/mynode_app_versions.sh
 
-# torrc.d dir
-sudo mkdir -p /etc/torrc.d
-
 # Create any necessary users
 sudo useradd -p $(openssl passwd -1 bolt) -m -s /bin/bash admin || true
 sudo useradd -m -s /bin/bash bitcoin || true
@@ -104,9 +98,6 @@ sudo mkdir -p /home/bitcoin/.mynode/
 sudo chown bitcoin:bitcoin /home/bitcoin
 sudo chown -R bitcoin:bitcoin /home/bitcoin/.mynode/
 
-# Update host info
-sudo hostnamectl set-hostname myNode
-# sudo echo "myNode" > /etc/hostname
 
 # Update sources
 sudo apt-get -y update --allow-releaseinfo-change
@@ -121,10 +112,16 @@ sudo apt-get -y install apt-transport-https curl gnupg ca-certificates
 if [ $IS_64_BIT = 1 ]; then
     sudo grep -qxF "deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || sudo bash -c "echo 'deb https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main' >> /etc/apt/sources.list"
     sudo grep -qxF "deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || sudo bash -c "echo 'deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main' >> /etc/apt/sources.list"
+    sudo grep -qxF "deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main" /etc/apt/sources.list  || sudo bash -c "echo 'deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main' >> /etc/apt/sources.list"
 fi
-if [ "$DEBIAN_VERSION" = "buster" ]; then
-    sudo grep -qxF "deb http://deb.debian.org/debian buster-backports main" /etc/apt/sources.list  || sudo bash -c "echo 'deb http://deb.debian.org/debian buster-backports main' >> /etc/apt/sources.list"
-fi
+#if [ "$DEBIAN_VERSION" = "buster" ]; then
+#    sudo grep -qxF "deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main" /etc/apt/sources.list  || sudo bash -c "echo 'deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main' >> /etc/apt/sources.list"
+#fi
+
+# torrc.d dir
+sudo mkdir -p /etc/torrc.d
+
+#################################
 
 # Add I2P Repo
 # /bin/bash $TMP_INSTALL_PATH/usr/share/mynode/scripts/add_i2p_repo.sh
@@ -135,7 +132,12 @@ echo "Adding I2P APT repository"
 sudo bash -c "echo 'deb https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main' > /etc/apt/sources.list.d/i2pd.list"
 sudo bash -c "echo 'deb-src https://repo.i2pd.xyz/$LINUX $DEBIAN_VERSION main' >> /etc/apt/sources.list.d/i2pd.list"
 
+##################################
+
 # Import Keys
+# wget https://raw.githubusercontent.com/bitcoin/bitcoin/master/contrib/builder-keys/keys.txt -O keys.txt
+# while read fingerprint keyholder_name; do gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys ${fingerprint}; done < ./keys.txt
+
 sudo curl https://keybase.io/roasbeef/pgp_keys.asc | sudo gpg --import
 sudo curl https://keybase.io/bitconner/pgp_keys.asc | sudo gpg --import
 sudo curl https://keybase.io/guggero/pgp_keys.asc | sudo gpg --import # Pool
@@ -147,15 +149,17 @@ sudo curl https://samouraiwallet.com/pgp.txt | sudo gpg --import # two keys from
 sudo gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys DE23E73BFA8A0AD5587D2FCDE80D2F3F311FD87E #loopd
 sudo gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys 26984CB69EB8C4A26196F7A4D7D916376026F177 # Lightning Terminal
 sudo wget -q https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc -O- | sudo apt-key add - # Tor
+#sudo wget -qO- https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc | gpg --dearmor | tee /usr/share/keyrings/tor-archive-keyring.gpg > /dev/null
 sudo gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 648ACFD622F3D138     # Debian Backports
 sudo gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9     # Debian Backports
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 74A941BA219EC810   # Tor
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 66F6C87B98EBCFE2   # I2P (R4SAS)
 
+##################################
+
 # Update OS
 # Needed to accept new repos
 sudo apt update 
-
 
 # Freeze any packages we don't want to update
 if [ $IS_X86 = 1 ]; then
@@ -183,6 +187,8 @@ sudo apt-get -y install zlib1g-dev libudev-dev libusb-1.0-0-dev python3-venv gun
 sudo apt-get -y install sqlite3 libsqlite3-dev torsocks python3-requests libsystemd-dev
 sudo apt-get -y install libjpeg-dev zlib1g-dev psmisc hexyl libbz2-dev liblzma-dev netcat-openbsd
 sudo apt-get -y install hdparm iotop nut obfs4proxy libpq-dev socat btrfs-progs i2pd
+
+##################################
 
 # Install packages dependent on Debian release
 if [ "$DEBIAN_VERSION" == "bullseye" ] || [ "$DEBIAN_VERSION" == "jammy" ]; then
@@ -273,8 +279,6 @@ fi
 
 # Install docker
 sudo mkdir -p /etc/apt/keyrings
-
-
 if [ LINUX == "debian" ]; then
     sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
     sudo bash -c "echo \
@@ -282,21 +286,17 @@ if [ LINUX == "debian" ]; then
       $(lsb_release -cs) stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null"
     sudo apt-get update --allow-releaseinfo-change
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true
-
 elif [ LINUX == "ubuntu" ]; then
     sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
-
     sudo bash -c "echo \
       'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
       $(lsb_release -cs) stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null"
-
     sudo apt-get update --allow-releaseinfo-change
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true 
 else
     sudo apt update --allow-releaseinfo-change
     sudo apt install -y docker docker-compose
 fi
-
 # Use systemd for managing docker
 sudo rm -f /etc/init.d/docker
 sudo rm -f /etc/systemd/system/multi-user.target.wants/docker.service
@@ -307,15 +307,13 @@ sudo usermod -aG docker admin
 sudo usermod -aG docker bitcoin
 sudo usermod -aG docker root
 
+##################################
+
 # Install node packages
 sudo npm install -g pug-cli browserify uglify-js babel-cli
 sudo npm install -g npm@$NODE_NPM_VERSION
 sudo npm install -g yarn
 
-
-# Remove existing MOTD login info
-sudo rm -rf /etc/motd
-sudo rm -rf /etc/update-motd.d/*
 
 #########################################################
 
@@ -947,7 +945,9 @@ sudo rm -rf /root/.ssh/known_hosts
 sudo rm -rf /etc/resolv.conf
 sudo rm -rf /tmp/*
 sudo rm -rf ~/setup_device.sh
+# Remove existing MOTD login info
 sudo rm -rf /etc/motd # Remove simple motd for update-motd.d
+sudo rm -rf /etc/update-motd.d/*
 
 # Remove default debian stuff
 sudo deluser mynode || true
@@ -964,6 +964,10 @@ if [ -f /boot/efi/EFI/debian/grubx64.efi ]; then
     sudo mkdir -p /boot/efi/EFI/BOOT
     sudo cp -f /boot/efi/EFI/debian/grubx64.efi /boot/efi/EFI/BOOT/bootx64.efi
 fi
+
+# Update host info
+sudo hostnamectl set-hostname myNode
+# sudo echo "myNode" > /etc/hostname
 
 sudo sync
 
