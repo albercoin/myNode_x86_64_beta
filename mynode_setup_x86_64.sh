@@ -965,8 +965,8 @@ if [ -f /boot/efi/EFI/debian/grubx64.efi ]; then
     sudo cp -f /boot/efi/EFI/debian/grubx64.efi /boot/efi/EFI/BOOT/bootx64.efi
 fi
 
-# File for not expand partition
-sudo -p /var/lib/mynode
+# NOT Expand Root FS
+sudo mkdir -p /var/lib/mynode
 sudo touch /var/lib/mynode/.expanded_rootfs
 
 sudo sync
