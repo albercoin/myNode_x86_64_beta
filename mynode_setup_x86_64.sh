@@ -966,7 +966,8 @@ if [ -f /boot/efi/EFI/debian/grubx64.efi ]; then
 fi
 
 # File for not expand partition
-touch /var/lib/mynode/.expanded_rootfs
+sudo -p /var/lib/mynode
+sudo touch /var/lib/mynode/.expanded_rootfs
 
 sudo sync
 
@@ -983,3 +984,8 @@ echo "   Reboot your device to begin!   "
 echo "##################################"
 echo ""
 echo ""
+echo "You can inspect status myNode with this command:"
+echo "sudo journalctl -f -u mynode"
+echo ""
+
+
