@@ -893,7 +893,6 @@ sudo systemctl enable check_in
 sudo systemctl enable premium_plus_connect
 sudo systemctl enable background
 sudo systemctl enable docker
-sudo systemctl enable mynode
 sudo systemctl enable quicksync
 sudo systemctl enable torrent_check
 sudo systemctl enable firewall
@@ -928,7 +927,8 @@ sudo systemctl enable rotate_logs
 sudo systemctl enable corsproxy_btcrpc
 sudo systemctl enable usb_extras
 sudo systemctl enable ob-watcher
-
+# and now... myNode start
+sudo systemctl enable mynode
 
 # Disable services
 sudo systemctl disable hitch || true
