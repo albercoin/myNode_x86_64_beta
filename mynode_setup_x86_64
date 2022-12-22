@@ -965,11 +965,14 @@ if [ -f /boot/efi/EFI/debian/grubx64.efi ]; then
     sudo cp -f /boot/efi/EFI/debian/grubx64.efi /boot/efi/EFI/BOOT/bootx64.efi
 fi
 
+# File for not expand partition
+touch /var/lib/mynode/.expanded_rootfs
+
+sudo sync
+
 # Update host info
 sudo hostnamectl set-hostname myNode
 # sudo echo "myNode" > /etc/hostname
-
-sudo sync
 
 set +x
 echo ""
