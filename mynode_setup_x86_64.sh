@@ -344,6 +344,18 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     sudo wget $BTC_UPGRADE_SHA256SUM_ASC_URL -O SHA256SUMS.asc
 
     sudo sha256sum --ignore-missing --check SHA256SUMS
+    
+    # Verificar la firma del archivo y enviar mensajes de estado a un archivo temporal
+    sudo gpg --status-fd 2 --verify SHA256SUMS.asc SHA256SUMS 2> gpg.status
+    # Leer el archivo temporal y evaluar si la verificación fue exitosa
+    if sudo grep -q "GOODSIG" gpg.status; then
+        echo "Good signature..."
+        sudo rm gpg.status
+    else
+        echo "No good signature..."
+        sudo rm gpg.status
+        exit 1;
+    fi
 
     # Install Bitcoin
     sudo tar -xvf bitcoin-$BTC_VERSION-$ARCH.tar.gz
