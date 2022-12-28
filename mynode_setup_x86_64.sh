@@ -254,7 +254,7 @@ if [[ "$CURRENT_PYTHON3_VERSION" != *"Python ${PYTHON_VERSION}"* ]]; then
 
     cd Python-*
     sudo ./configure
-    sudo make -j "$(($(nproc)))"
+    sudo make -j $(nproc)
     sudo make install
     cd ~
 else
@@ -629,7 +629,7 @@ if [ "$CURRENT" != "$SECP256K1_VERSION" ]; then
 
     sudo ./autogen.sh
     sudo ./configure --enable-module-recovery --disable-jni --enable-experimental --enable-module-ecdh --enable-benchmark=no
-    sudo make -j "$(($(nproc)))"
+    sudo make -j $(nproc)
     sudo make install
     sudo cp -f include/* /usr/include/
     sudo rm -rf /tmp/secp256k1
