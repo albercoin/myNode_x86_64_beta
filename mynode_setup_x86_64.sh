@@ -346,7 +346,7 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     sudo sha256sum --ignore-missing --check SHA256SUMS
     
     # Verificar la firma del archivo y enviar mensajes de estado a un archivo temporal
-    sudo gpg --status-fd 2 --verify SHA256SUMS.asc SHA256SUMS >> gpg.status
+    sudo gpg --status-fd=2 --verify SHA256SUMS.asc SHA256SUMS >> gpg.status
     # Leer el archivo temporal y evaluar si la verificación fue exitosa
     if sudo grep -q "GOODSIG" gpg.status; then
         echo "Good signature..."
