@@ -328,7 +328,7 @@ ARCH="x86_64-linux-gnu"
 BTC_UPGRADE_URL=https://bitcoincore.org/bin/bitcoin-core-$BTC_VERSION/bitcoin-$BTC_VERSION-$ARCH.tar.gz
 BTC_UPGRADE_SHA256SUM_URL=https://bitcoincore.org/bin/bitcoin-core-$BTC_VERSION/SHA256SUMS
 BTC_UPGRADE_SHA256SUM_ASC_URL=https://bitcoincore.org/bin/bitcoin-core-$BTC_VERSION/SHA256SUMS.asc
-BTC_CLI_COMPLETION_URL=https://raw.githubusercontent.com/bitcoin/bitcoin/v$BTC_VERSION/contrib/bitcoin-cli.bash-completion
+BTC_CLI_COMPLETION_URL=https://raw.githubusercontent.com/bitcoin/bitcoin/master/contrib/completions/bash/bitcoin-cli.bash
 CURRENT=""
 if [ -f $BTC_VERSION_FILE ]; then
     CURRENT=$(cat $BTC_VERSION_FILE)
@@ -383,8 +383,8 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     BTC_VERSION_FILE=$(echo $BTC_VERSION)
 
     # Install bash-completion for bitcoin-cli
-    sudo wget $BTC_CLI_COMPLETION_URL -O bitcoin-cli.bash-completion
-    sudo cp bitcoin-cli.bash-completion /etc/bash_completion.d/bitcoin-cli
+    sudo wget $BTC_CLI_COMPLETION_URL -O bitcoin-cli.bash
+    sudo cp bitcoin-cli.bash /etc/bash_completion.d/bitcoin-cli
     
     sudo rm -rf /opt/download/*
     cd
