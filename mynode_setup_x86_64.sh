@@ -457,9 +457,11 @@ if [ "$CURRENT" != "$LOOP_VERSION" ]; then
     sudo wget $LOOP_UPGRADE_MANIFEST_URL -O manifest.txt
     sudo wget $LOOP_UPGRADE_MANIFEST_SIG_URL -O manifest.txt.sig
 
-    sudo gpg --verify manifest.txt.sig manifest.txt
-    VAL=$?
-    if [ $VAL == 0 ]; then
+    CHECKSUM=$(sha256sum --ignore-missing --check manifest.txt)
+    VALORCHECKSUM=$?
+    if [ $VALORCHECKSUM -eq 0 ]; then	
+    	echo "OK..."
+    	echo $(sha256sum --ignore-missing --check manifest.txt | awk -F ":" '{printf tolower($2)}')	
         # Install Loop
         sudo tar -xzf loop-*.tar.gz
         sudo mv $LOOP_ARCH-$LOOP_VERSION loop
@@ -468,8 +470,12 @@ if [ "$CURRENT" != "$LOOP_VERSION" ]; then
         # Mark current version
         LOOP_VERSION_FILE=$(echo $LOOP_VERSION)
     else
+    	echo "KO..."
+    	echo $(sha256sum --ignore-missing --check manifest.txt | awk -F ":" '{printf tolower($2)}')
         echo "ERROR UPGRADING LND - GPG FAILED"
+    	exit $VALORCHECKSUM
     fi
+    
     sudo rm -rf /opt/download/*
     cd
 fi
