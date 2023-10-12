@@ -352,18 +352,22 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     #else
     #    echo "No good signature..."
     #fi
-    # Verificar la firma del archivo y enviar mensajes de estado a un archivo temporal
-    sudo chmod +r SHA256SUMS.asc SHA256SUMS
-    sudo gpg --status-fd=2 --verify SHA256SUMS.asc SHA256SUMS >> gpg.status
-    # Leer el archivo temporal y evaluar si la verificación fue exitosa
-    if sudo grep -q "GOODSIG" gpg.status; then
-        echo "Good signature..."
-        sudo rm gpg.status
+
+
+    CHECKSUM=$(sha256sum --ignore-missing --check SHA256SUMS)
+    VALORCHECKSUM=$?
+    if [ $VALORCHECKSUM -eq 0 ]; then	
+    	echo "OK..."
+    	echo $(sha256sum --ignore-missing --check SHA256SUMS | awk -F ":" '{printf tolower($2)}')	
     else
-        echo "No good signature..."
-        sudo rm gpg.status
-        exit 1;
+    	echo "KO..."
+    	echo $(sha256sum --ignore-missing --check SHA256SUMS | awk -F ":" '{printf tolower($2)}')
+    	exit $VALORCHECKSUM
     fi
+    
+    curl -s "https://api.github.com/repositories/355107265/contents/builder-keys" | grep download_url | grep -oE "https://[a-zA-Z0-9./-]+" | while read url; do curl -s "$url" | gpg --import; done
+    gpg --verify SHA256SUMS.asc
+    
 
     # Install Bitcoin
     sudo tar -xvf bitcoin-$BTC_VERSION-$ARCH.tar.gz
