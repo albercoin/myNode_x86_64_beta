@@ -729,15 +729,15 @@ if [ "$CURRENT" != "$RTL_VERSION" ]; then
     #sudo -u bitcoin wget $RTL_UPGRADE_ASC_URL -O RTL.tar.gz.asc
     #gpg --verify RTL.tar.gz.asc RTL.tar.gz
 
+
     sudo -u bitcoin tar -xvf RTL.tar.gz
     sudo -u bitcoin rm RTL.tar.gz
     sudo -u bitcoin mv RTL-* RTL
     cd RTL
     sudo -u bitcoin NG_CLI_ANALYTICS=false npm install --only=production --legacy-peer-deps
-    sudo -u bitcoin npm install request --save
+    
+    echo $RTL_VERSION > $RTL_VERSION_FILE
     cd
-
-    RTL_VERSION_FILE=$(echo $RTL_VERSION)
 fi
 
 
