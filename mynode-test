@@ -1,5 +1,42 @@
 #!/bin/bash
 
+sudo -v
+
+set -x
+set -e
+
+# Usage: $0 <ip address | online>
+if [ "$#" != "1" ]; then
+    echo "Install ONLINE..."
+    SERVER_IP=online
+else
+    echo "Install IP ADDRESS... " $1
+    SERVER_IP=$1
+fi
+
+# Determine Device
+sudo apt install lsb-release
+
+IS_X86=0
+IS_32_BIT=0
+IS_64_BIT=0
+IS_UNKNOWN=1
+DEVICE_TYPE="unknown"
+LINUX=$(lsb_release -i | awk -F ":" '{printf tolower($2)}' | sed -e 's/^[[:space:]]*//')
+if [ $LINUX == "pop" ]; then
+    LINUX="ubuntu"
+fi   
+DEBIAN_VERSION=$(lsb_release -c -s) || DEBIAN_VERSION="unknown"
+uname -a | grep x86_64 && IS_X86=1 && IS_64_BIT=1 && IS_UNKNOWN=0 || true
+if [ $IS_UNKNOWN = 1 ]; then
+    echo "UNKNOWN DEVICE TYPE"
+    exit 1
+fi
+
+
+
+###################################################################################################
+
 ###
 ### Setup myNode (all devices)
 ### Run with "sudo"
