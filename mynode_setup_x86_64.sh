@@ -212,6 +212,7 @@ fi
 # Install device specific packages
 if [ $IS_X86 = 1 ]; then
     sudo apt-get -y install cloud-init
+    apt-get -y install intel-microcode || true
 fi
 
 # Make sure some software is removed
@@ -240,6 +241,46 @@ sudo usermod -a -G debian-tor bitcoin
 sudo adduser admin bitcoin
 sudo adduser joinmarket bitcoin
 sudo bash -c "grep 'joinmarket' /etc/sudoers || (echo 'joinmarket ALL=(ALL) NOPASSWD:ALL' | EDITOR='tee -a' visudo)"
+
+# Install Go
+GO_ARCH="amd64"
+GO_UPGRADE_URL=https://go.dev/dl/go$GO_VERSION.linux-$GO_ARCH.tar.gz
+CURRENT=""
+if [ -f $GO_VERSION_FILE ]; then
+    CURRENT=$(cat $GO_VERSION_FILE)
+fi
+if [ "$CURRENT" != "$GO_VERSION" ]; then
+    rm -rf /opt/download
+    mkdir -p /opt/download
+    cd /opt/download
+
+    wget $GO_UPGRADE_URL -O go.tar.gz
+    rm -rf /usr/local/go && tar -C /usr/local -xzf go.tar.gz
+
+    # Mark current version
+    echo $GO_VERSION > $GO_VERSION_FILE
+fi
+echo "export GOBIN=/usr/local/go/bin; PATH=\$PATH:/usr/local/go/bin" > /etc/profile.d/go.sh
+grep -qxF '. /etc/profile.d/go.sh' /root/.bashrc || echo '. /etc/profile.d/go.sh' >> /root/.bashrc
+
+
+# Install Rust (only needed on 32-bit RPi for building some python wheels)
+if [ ! -f $HOME/.cargo/env ]; then
+    wget https://sh.rustup.rs -O /tmp/setup_rust.sh
+    /bin/bash /tmp/setup_rust.sh -y --default-toolchain none
+    sync
+fi
+if [ -f $HOME/.cargo/env ]; then
+    # Remove old toolchains
+    source $HOME/.cargo/env
+    TOOLCHAINS=$(rustup toolchain list)
+    for toolchain in $TOOLCHAINS; do
+        if [[ "$toolchain" == *"linux"* ]] && [[ "$toolchain" != *"${RUST_VERSION}"* ]]; then
+            rustup toolchain remove $toolchain || true
+        fi
+    done    
+fi
+
 
 
 # Install Python3 (latest)
@@ -560,47 +601,45 @@ if [ "$CURRENT" != "$LIT_VERSION" ]; then
     cd
 fi
 
+# Upgrade Lightning Chantools
+echo "Upgrading chantools..."
+
+CHANTOOLS_ARCH="chantools-linux-amd64"
+CHANTOOLS_UPGRADE_URL=https://github.com/lightninglabs/chantools/releases/download/$CHANTOOLS_VERSION/$CHANTOOLS_ARCH-$CHANTOOLS_VERSION.tar.gz
+CURRENT=""
+if [ -f $CHANTOOLS_VERSION_FILE ]; then
+    CURRENT=$(cat $CHANTOOLS_VERSION_FILE)
+fi
+if [ "$CURRENT" != "$CHANTOOLS_VERSION" ]; then
+    # Download and install lit
+    rm -rf /opt/download
+    mkdir -p /opt/download
+    cd /opt/download
+
+    wget $CHANTOOLS_UPGRADE_URL
+    wget $CHANTOOLS_UPGRADE_MANIFEST_URL -O manifest.txt
+    wget $CHANTOOLS_UPGRADE_MANIFEST_SIG_URL  -O manifest.txt.sig
+
+    gpg --verify manifest.txt.sig manifest.txt
+    if [ $? == 0 ]; then
+        # Install lit
+        tar -xzf chantools-*.tar.gz
+        mv $CHANTOOLS_ARCH-$CHANTOOLS_VERSION chantools
+        install -m 0755 -o root -g root -t /usr/local/bin chantools/chantools
+
+        # Mark current version
+        sudo -u bitcoin echo $CHANTOOLS_VERSION | sudo -u bitcoin tee $CHANTOOLS_VERSION_FILE
+    else
+        echo "ERROR UPGRADING CHANTOOLS - GPG FAILED"
+    fi
+fi
+cd ~
 
 
 # Setup "install" location for some apps
 sudo mkdir -p /opt/mynode
 sudo chown -R bitcoin:bitcoin /opt/mynode
 
-
-# Install LND Hub
-echo .
-echo "****************************************"
-echo "Installing LND Hub..."
-echo "****************************************"
-echo .
-
-LNDHUB_UPGRADE_URL=https://github.com/BlueWallet/LndHub/archive/$LNDHUB_VERSION.tar.gz
-CURRENT=""
-if [ -f $LNDHUB_VERSION_FILE ]; then
-    CURRENT=$(cat $LNDHUB_VERSION_FILE)
-fi
-if [ "$CURRENT" != "$LNDHUB_VERSION" ]; then
-    cd /opt/mynode
-    sudo rm -rf LndHub
-
-    sudo wget $LNDHUB_UPGRADE_URL
-    sudo tar -xzf ${LNDHUB_VERSION}.tar.gz
-    sudo rm -f ${LNDHUB_VERSION}.tar.gz
-    sudo mv LndHub-* LndHub
-    sudo chown -R bitcoin:bitcoin LndHub
-
-    cd LndHub
-    sudo -u bitcoin npm install --only=production
-    sudo rm -f tls.cert
-    sudo -u bitcoin ln -s /home/bitcoin/.lnd/tls.cert tls.cert
-    sudo rm -f admin.macaroon
-    sudo -u bitcoin ln -s /home/bitcoin/.lnd/data/chain/bitcoin/mainnet/admin.macaroon admin.macaroon
-    cd
-
-    # Mark current version
-    sudo -u bitcoin echo $LNDHUB_VERSION | sudo -u bitcoin tee $LNDHUB_VERSION_FILE
-fi
-cd ~
 
 
 # Install cors proxy (my fork)
