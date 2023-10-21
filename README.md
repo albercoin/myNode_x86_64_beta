@@ -11,7 +11,7 @@ This script has been tested and working fine in:
 CURL is needed, remember install it previously: 
 
 ``` 
-sudo apt install curl
+sudo apt -y install curl
 ```
 
 ### Install
