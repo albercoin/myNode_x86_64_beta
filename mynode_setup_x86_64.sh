@@ -1056,7 +1056,7 @@ sudo rm -rf /home/admin/.bash_history
 sudo rm -rf /home/bitcoin/.bash_history
 sudo rm -rf /root/.bash_history
 sudo rm -rf /root/.ssh/known_hosts
-sudo rm -rf /etc/resolv.conf
+#sudo rm -rf /etc/resolv.conf
 sudo rm -rf /tmp/*
 sudo rm -rf ~/setup_device.sh
 
@@ -1065,8 +1065,8 @@ sudo rm -rf /etc/motd # Remove simple motd for update-motd.d
 sudo rm -rf /etc/update-motd.d/*
 
 # Remove default debian stuff
-sudo deluser mynode || true
-sudo rm -rf /home/mynode || true
+sudo deluser $USER || true
+sudo rm -rf /home/$USER || true
 
 # Add fsck force to startup for x86
 if [ $IS_X86 = 1 ]; then
