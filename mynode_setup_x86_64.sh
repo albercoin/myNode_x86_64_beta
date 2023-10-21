@@ -736,7 +736,6 @@ if [ "$CURRENT" != "$WHIRLPOOL_VERSION" ]; then
     WHIRLPOOL_VERSION_FILE=$(echo $WHIRLPOOL_VERSION)
 fi
 
-<< NOT_INSTALL
 # Install RTL
 echo .
 echo "****************************************"
@@ -757,7 +756,6 @@ if [ "$CURRENT" != "$RTL_VERSION" ]; then
     #sudo -u bitcoin wget $RTL_UPGRADE_ASC_URL -O RTL.tar.gz.asc
     #gpg --verify RTL.tar.gz.asc RTL.tar.gz
 
-
     sudo -u bitcoin tar -xvf RTL.tar.gz
     sudo -u bitcoin rm RTL.tar.gz
     sudo -u bitcoin mv RTL-* RTL
@@ -767,7 +765,6 @@ if [ "$CURRENT" != "$RTL_VERSION" ]; then
     sudo echo $RTL_VERSION > $RTL_VERSION_FILE
     cd
 fi
-NOT_INSTALL
 
 # Install BTC RPC Explorer
 echo .
