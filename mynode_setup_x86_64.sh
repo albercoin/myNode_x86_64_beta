@@ -162,12 +162,12 @@ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 66F6C87B98EBCFE2  
 sudo apt update 
 
 # Freeze any packages we don't want to update
-if [ $IS_X86 = 1 ]; then
-    sudo apt-mark hold grub*
-fi
+#if [ $IS_X86 = 1 ]; then
+#    sudo apt-mark hold grub*
+#fi
 
 # Upgrade packages
-sudo apt-get -y upgrade
+sudo apt -y upgrade
 
 # Install other tools (run section multiple times to make sure success)
 export DEBIAN_FRONTEND=noninteractive
@@ -181,7 +181,7 @@ sudo apt-get -y install inotify-tools libssl-dev tor tmux screen fonts-dejavu
 sudo apt-get -y install pv sysstat network-manager rsync parted unzip pkg-config
 sudo apt-get -y install libfreetype6-dev libpng-dev libatlas-base-dev libgmp-dev libltdl-dev
 sudo apt-get -y install libffi-dev libssl-dev python3-bottle automake libtool libltdl7
-sudo apt-get -y -qq install apt-transport-https ca-certificates
+sudo apt-get -y install apt-transport-https ca-certificates
 sudo apt-get -y install openjdk-11-jre libevent-dev ncurses-dev
 sudo apt-get -y install zlib1g-dev libudev-dev libusb-1.0-0-dev python3-venv gunicorn
 sudo apt-get -y install sqlite3 libsqlite3-dev torsocks python3-requests libsystemd-dev
@@ -192,9 +192,9 @@ sudo apt-get -y install hdparm iotop nut obfs4proxy libpq-dev socat btrfs-progs 
 
 # Install packages dependent on Debian release
 if [ "$DEBIAN_VERSION" == "bullseye" ] || [ "$DEBIAN_VERSION" == "jammy" ]; then
-    sudo apt-get -y install wireguard
+    sudo apt -y install wireguard
 elif [ "$DEBIAN_VERSION" == "buster" ]; then
-    $TORIFY sudo apt-get -y -t buster-backports install wireguard
+    $TORIFY sudo apt -y -t buster-backports install wireguard
 else
     echo .
     echo "========================================="
@@ -206,23 +206,23 @@ fi
 
 # Install Openbox GUI if not desktop available
 if [ $IS_X86 = 1 ] && [ -z $DESKTOP_SESSION ]; then
-    sudo apt-get -y install xorg chromium openbox lightdm
+    sudo apt -y install xorg chromium openbox lightdm
 fi
 
 # Install device specific packages
-if [ $IS_X86 = 1 ]; then
-    sudo apt-get -y install cloud-init
-    apt-get -y install intel-microcode || true
-fi
+#if [ $IS_X86 = 1 ]; then
+#    sudo apt -y install cloud-init
+#    sudo apt -y install intel-microcode || true
+#fi
 
 # Make sure some software is removed
-sudo apt-get -y purge ntp # (conflicts with systemd-timedatectl)
+sudo apt -y purge ntp # (conflicts with systemd-timedatectl)
 if [ $(lsb_release -i | awk -F ":" '{printf tolower($2)}') != "pop" ]; then
-    sudo apt-get -y purge chrony # (conflicts with systemd-timedatectl)
+    sudo apt -y purge chrony # (conflicts with systemd-timedatectl)
 fi
 
 # Install other things without recommendation
-sudo apt-get -y install --no-install-recommends expect
+#sudo apt-get -y install --no-install-recommends expect
 
 
 # Install nginx
@@ -973,8 +973,8 @@ sudo touch /home/bitcoin/.mynode/install_dojo
 
 
 # Make sure we are using legacy iptables
-sudo update-alternatives --set iptables /usr/sbin/iptables-legacy || true
-sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy || true
+#sudo update-alternatives --set iptables /usr/sbin/iptables-legacy || true
+#sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy || true
 
 
 #########################################################
@@ -998,8 +998,8 @@ sudo rm -rf /opt/download
 sudo mkdir -p /opt/download
 
 # Clean apt-cache
-sudo apt-get -y autoclean
-sudo apt-get -y autoremove
+sudo apt -y autoremove
+sudo apt -y autoclean
 
 # Setup myNode Startup Script
 sudo systemctl daemon-reload
@@ -1059,14 +1059,8 @@ sudo rm -rf /root/.ssh/known_hosts
 #sudo rm -rf /etc/resolv.conf
 sudo rm -rf /tmp/*
 sudo rm -rf ~/setup_device.sh
-
-# Remove existing MOTD login info
 sudo rm -rf /etc/motd # Remove simple motd for update-motd.d
-sudo rm -rf /etc/update-motd.d/*
 
-# Remove default debian stuff
-sudo deluser $USER || true
-sudo rm -rf /home/$USER || true
 
 # Add fsck force to startup for x86
 if [ $IS_X86 = 1 ]; then
@@ -1075,10 +1069,10 @@ if [ $IS_X86 = 1 ]; then
 fi
 
 # Add generic boot option if UEFI
-if [ -f /boot/efi/EFI/debian/grubx64.efi ]; then
-    sudo mkdir -p /boot/efi/EFI/BOOT
-    sudo cp -f /boot/efi/EFI/debian/grubx64.efi /boot/efi/EFI/BOOT/bootx64.efi
-fi
+#if [ -f /boot/efi/EFI/debian/grubx64.efi ]; then
+#    sudo mkdir -p /boot/efi/EFI/BOOT
+#    sudo cp -f /boot/efi/EFI/debian/grubx64.efi /boot/efi/EFI/BOOT/bootx64.efi
+#fi
 
 # NOT Expand Root FS
 sudo mkdir -p /var/lib/mynode
@@ -1087,6 +1081,10 @@ sudo sync
 
 # Update host info
 sudo hostnamectl set-hostname myNode # sudo echo "myNode" > /etc/hostname
+
+# Remove default debian stuff
+#sudo deluser $USER || true
+#sudo rm -rf /home/$USER || true
 
 set +x
 echo ""
