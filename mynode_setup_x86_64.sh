@@ -12,8 +12,8 @@ echo "*****************************"
 sleep 1
 sudo -v
 
-set -x
-set -e
+#set -x # set -o xtrace --> trace mode
+#set -e # set -o errexit --> error exit mode
 
 # Usage: $0 <ip address | online>
 if [ "$#" != "1" ]; then
