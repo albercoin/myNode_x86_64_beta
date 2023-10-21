@@ -34,6 +34,8 @@ if [ $IS_UNKNOWN = 1 ]; then
 fi
 
 
+# Source file containing app versions
+source /tmp/upgrade/out/rootfs_*/usr/share/mynode/mynode_app_versions.sh
 
 ###################################################################################################
 
