@@ -347,15 +347,6 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
 
     sudo sha256sum --ignore-missing --check SHA256SUMS
 
-    #sudo gpg --verify SHA256SUMS.asc SHA256SUMS
-    #VAL=$?
-    #if [ $VAL == 0 ]; then
-    #    echo "Good signature..."
-    #else
-    #    echo "No good signature..."
-    #fi
-
-
     CHECKSUM=$(sha256sum --ignore-missing --check SHA256SUMS)
     VALORCHECKSUM=$?
     if [ $VALORCHECKSUM -eq 0 ]; then	
@@ -381,8 +372,9 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
         sudo -u bitcoin ln -s /mnt/hdd/mynode/bitcoin /home/bitcoin/.bitcoin
     fi
     
-    sudo mkdir -p /home/admin/.bitcoin
-    BTC_VERSION_FILE=$(echo $BTC_VERSION)
+    sudo mkdir -p /home/admin/.bitcoin    
+    # Mark current version
+    sudo -u bitcoin echo $BTC_VERSION | sudo -u bitcoin tee $BTC_VERSION_FILE
 
     # Install bash-completion for bitcoin-cli
     sudo wget $BTC_CLI_COMPLETION_URL -O bitcoin-cli.bash
@@ -430,7 +422,8 @@ if [ "$CURRENT" != "$LND_VERSION" ]; then
     sudo rm -f /usr/bin/ip
     sudo ln -s /bin/ip /usr/bin/ip || true
 
-    LND_VERSION_FILE=$(echo $LND_VERSION)
+    # Mark current version
+    sudo -u bitcoin echo $LND_VERSION | sudo -u bitcoin tee $LND_VERSION_FILE
 
     # Download bash-completion file for lncli
     sudo wget $LNCLI_COMPLETION_URL
@@ -475,7 +468,7 @@ if [ "$CURRENT" != "$LOOP_VERSION" ]; then
         sudo install -m 0755 -o root -g root -t /usr/local/bin loop/*
 
         # Mark current version
-        LOOP_VERSION_FILE=$(echo $LOOP_VERSION)
+        sudo -u bitcoin echo $LOOP_VERSION | sudo -u bitcoin tee $LOOP_VERSION_FILE
     else
     	echo "KO..."
     	echo $(sha256sum --ignore-missing --check manifest.txt | awk -F ":" '{printf tolower($2)}')
@@ -519,7 +512,7 @@ if [ "$CURRENT" != "$POOL_VERSION" ]; then
         sudo install -m 0755 -o root -g root -t /usr/local/bin pool/*
 
         # Mark current version
-        POOL_VERSION_FILE=$(echo $POOL_VERSION)
+        sudo -u bitcoin echo $POOL_VERSION | sudo -u bitcoin tee $POOL_VERSION_FILE
     else
         echo "ERROR UPGRADING POOL - GPG FAILED"
     fi
@@ -559,7 +552,7 @@ if [ "$CURRENT" != "$LIT_VERSION" ]; then
         sudo sudo install -m 0755 -o root -g root -t /usr/local/bin lightning-terminal/lit*
 
         # Mark current version
-        LIT_VERSION_FILE=$(echo $LIT_VERSION)
+        sudo -u bitcoin echo $LIT_VERSION | sudo -u bitcoin tee $LIT_VERSION_FILE
     else
         echo "ERROR UPGRADING LIT - GPG FAILED"
     fi
@@ -603,8 +596,9 @@ if [ "$CURRENT" != "$LNDHUB_VERSION" ]; then
     sudo rm -f admin.macaroon
     sudo -u bitcoin ln -s /home/bitcoin/.lnd/data/chain/bitcoin/mainnet/admin.macaroon admin.macaroon
     cd
-    
-    LNDHUB_VERSION_FILE=$(echo $LNDHUB_VERSION)
+
+    # Mark current version
+    sudo -u bitcoin echo $LNDHUB_VERSION | sudo -u bitcoin tee $LNDHUB_VERSION_FILE
 fi
 cd ~
 
@@ -634,7 +628,8 @@ if [ "$CURRENT" != "$CORSPROXY_VERSION" ]; then
     cd corsproxy
     sudo npm install
     cd
-    CORSPROXY_VERSION_FILE=$(echo $CORSPROXY_VERSION)
+    # Mark current version
+    sudo -u bitcoin echo $CORSPROXY_VERSION | sudo -u bitcoin tee $CORSPROXY_VERSION_FILE
 fi
 
 
@@ -643,7 +638,8 @@ echo .
 echo "Installing Electrs..."
 echo .
 
-ELECTRS_VERSION_FILE=$(echo $ELECTRS_VERSION)
+# Mark current version
+sudo -u bitcoin echo $ELECTRS_VERSION | sudo -u bitcoin tee $ELECTRS_VERSION_FILE
 
 
 # Install recent version of secp256k1
@@ -672,7 +668,8 @@ if [ "$CURRENT" != "$SECP256K1_VERSION" ]; then
     sudo rm -rf /tmp/secp256k1
     cd
 
-    SECP256K1_VERSION_FILE=$(echo $SECP256K1_VERSION)
+    # Mark current version
+    sudo -u bitcoin echo $SECP256K1_VERSION | sudo -u bitcoin tee $SECP256K1_VERSION_FILE
 fi
 
 # Install JoinInBox
@@ -707,8 +704,9 @@ if [ "$CURRENT" != "$JOININBOX_VERSION" ]; then
     # Enable obwatcher at the end of setup_device.sh
 
     cd
-    
-    JOININBOX_VERSION_FILE=$(echo $JOININBOX_VERSION)
+
+    # Mark current version
+    sudo -u bitcoin echo $JOININBOX_VERSION | sudo -u bitcoin tee $JOININBOX_VERSION_FILE
 fi
 
 # Install Whirlpool
@@ -733,7 +731,8 @@ if [ "$CURRENT" != "$WHIRLPOOL_VERSION" ]; then
     sudo gpg --verify whirlpool.asc
     cd
 
-    WHIRLPOOL_VERSION_FILE=$(echo $WHIRLPOOL_VERSION)
+    # Mark current version
+    sudo -u bitcoin echo $WHIRLPOOL_VERSION | sudo -u bitcoin tee $WHIRLPOOL_VERSION_FILE
 fi
 
 # Install RTL
@@ -762,8 +761,8 @@ if [ "$CURRENT" != "$RTL_VERSION" ]; then
     cd RTL
     sudo -u bitcoin NG_CLI_ANALYTICS=false npm install --only=production --legacy-peer-deps
     
-    #sudo -u bitcoin echo $RTL_VERSION > $RTL_VERSION_FILE
-    RTL_VERSION_FILE=$(echo $RTL_VERSION)
+    # Mark current version
+    sudo -u bitcoin echo $RTL_VERSION | sudo -u bitcoin tee $RTL_VERSION_FILE
     
     cd
 fi
@@ -791,7 +790,8 @@ if [ "$CURRENT" != "$BTCRPCEXPLORER_VERSION" ]; then
     sudo -u bitcoin npm install --only=production
     cd
 
-    BTCRPCEXPLORER_VERSION_FILE=$(echo $BTCRPCEXPLORER_VERSION)
+    # Mark current version
+    sudo -u bitcoin echo $BTCRPCEXPLORER_VERSION | sudo -u bitcoin tee $BTCRPCEXPLORER_VERSION_FILE
 fi
 
 
@@ -823,7 +823,8 @@ if [ "$CURRENT" != "$SPECTER_VERSION" ]; then
     deactivate
     cd
 
-    SPECTER_VERSION_FILE=$(echo $SPECTER_VERSION)
+    # Mark current version
+    sudo -u bitcoin echo $SPECTER_VERSION | sudo -u bitcoin tee $SPECTER_VERSION_FILE
 fi
 
 
@@ -860,7 +861,8 @@ if [ "$CURRENT" != "$THUNDERHUB_VERSION" ]; then
     sudo ln -s /mnt/hdd/mynode/thunderhub/.env.local .env.local
     cd
 
-    THUNDERHUB_VERSION_FILE=$(echo $THUNDERHUB_VERSION)
+    # Mark current version
+    sudo -u bitcoin echo $THUNDERHUB_VERSION | sudo -u bitcoin tee $THUNDERHUB_VERSION_FILE
 fi
 
 
@@ -889,7 +891,8 @@ if [ "$CURRENT" != "$LNDCONNECT_VERSION" ]; then
     sudo rm -rf /opt/download/*
     cd
 
-    LNDCONNECT_VERSION_FILE=$(echo $LNDCONNECT_VERSION)
+    # Mark current version
+    sudo -u bitcoin echo $LNDCONNECT_VERSION | sudo -u bitcoin tee $LNDCONNECT_VERSION_FILE
 fi
 
 
