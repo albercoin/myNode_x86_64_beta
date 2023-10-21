@@ -383,7 +383,7 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     
     sudo mkdir -p /home/admin/.bitcoin
     
-    sudo -u bitcoin echo $BTC_VERSION | sudo -u bitcoin tee BTC_VERSION_FILE
+    sudo -u bitcoin echo $BTC_VERSION | sudo -u bitcoin tee $BTC_VERSION_FILE
 
     # Install bash-completion for bitcoin-cli
     sudo wget $BTC_CLI_COMPLETION_URL -O bitcoin-cli.bash
