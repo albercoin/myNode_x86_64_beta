@@ -320,7 +320,9 @@ sudo npm install -g yarn
 
 # Install Bitcoin
 echo .
-echo "Installing Bitcoin core..."
+echo "**********************************"
+echo "*** Installing Bitcoin core... ***"
+echo "**********************************"
 echo .
 
 ARCH="x86_64-linux-gnu"
@@ -393,8 +395,11 @@ fi
 
 # Install Lightning
 echo .
-echo "Installing Lightning..."
+echo "*******************************"
+echo "*** Installing Lightning... ***"
+echo "*******************************"
 echo .
+
 LND_ARCH="lnd-linux-amd64"
 LND_UPGRADE_URL=https://github.com/lightningnetwork/lnd/releases/download/$LND_VERSION/$LND_ARCH-$LND_VERSION.tar.gz
 LNCLI_COMPLETION_URL=https://raw.githubusercontent.com/lightningnetwork/lnd/$LND_VERSION/contrib/lncli.bash-completion
@@ -438,7 +443,9 @@ fi
 
 # Install Loop
 echo .
-echo "Installing loop..."
+echo "**************************"
+echo "*** Installing loop... ***"
+echo "**************************"
 echo .
 
 LOOP_ARCH="loop-linux-amd64"
@@ -482,7 +489,9 @@ fi
 
 # Install Pool
 echo .
-echo "Installing pool..."
+echo "**************************"
+echo "*** Installing pool... ***"
+echo "**************************"
 echo .
 
 POOL_ARCH="pool-linux-amd64"
@@ -520,7 +529,9 @@ fi
 
 # Install Lightning Terminal
 echo .
-echo "Installing Lightning Terminal..."
+echo "****************************************"
+echo "*** Installing Lightning Terminal... ***"
+echo "****************************************"
 echo .
 
 LIT_ARCH="lightning-terminal-linux-amd64"
@@ -565,8 +576,11 @@ sudo chown -R bitcoin:bitcoin /opt/mynode
 
 # Install LND Hub
 echo .
+echo "****************************************"
 echo "Installing LND Hub..."
+echo "****************************************"
 echo .
+
 LNDHUB_UPGRADE_URL=https://github.com/BlueWallet/LndHub/archive/$LNDHUB_VERSION.tar.gz
 CURRENT=""
 if [ -f $LNDHUB_VERSION_FILE ]; then
@@ -597,8 +611,11 @@ cd ~
 
 # Install cors proxy (my fork)
 echo .
+echo "****************************************"
 echo "Installing cors proxy by tehelsper..."
+echo "****************************************"
 echo .
+
 CORSPROXY_UPGRADE_URL=https://github.com/tehelsper/CORS-Proxy/archive/$CORSPROXY_VERSION.tar.gz
 CURRENT=""
 if [ -f $CORSPROXY_VERSION_FILE ]; then
@@ -631,7 +648,9 @@ ELECTRS_VERSION_FILE=$(echo $ELECTRS_VERSION)
 
 # Install recent version of secp256k1
 echo .
+echo "****************************************"
 echo "Installing secp256k1..."
+echo "****************************************"
 echo .
 
 SECP256K1_UPGRADE_URL=https://github.com/bitcoin-core/secp256k1/archive/$SECP256K1_VERSION.tar.gz
@@ -658,8 +677,11 @@ fi
 
 # Install JoinInBox
 echo .
+echo "****************************************"
 echo "Installing JoinInBox..."
+echo "****************************************"
 echo .
+
 JOININBOX_UPGRADE_URL=https://github.com/openoms/joininbox/archive/$JOININBOX_VERSION.tar.gz
 CURRENT=""
 if [ -f $JOININBOX_VERSION_FILE ]; then
@@ -691,8 +713,11 @@ fi
 
 # Install Whirlpool
 echo .
+echo "****************************************"
 echo "Installing Whirlpool..."
+echo "****************************************"
 echo .
+
 WHIRLPOOL_UPGRADE_URL=https://code.samourai.io/whirlpool/whirlpool-client-cli/uploads/$WHIRLPOOL_UPLOAD_FILE_ID/whirlpool-client-cli-$WHIRLPOOL_VERSION-run.jar
 CURRENT=""
 if [ -f $WHIRLPOOL_VERSION_FILE ]; then
@@ -711,11 +736,14 @@ if [ "$CURRENT" != "$WHIRLPOOL_VERSION" ]; then
     WHIRLPOOL_VERSION_FILE=$(echo $WHIRLPOOL_VERSION)
 fi
 
-
+<< NOT_INSTALL
 # Install RTL
 echo .
+echo "****************************************"
 echo "Installing RTL..."
+echo "****************************************"
 echo .
+
 RTL_UPGRADE_URL=https://github.com/Ride-The-Lightning/RTL/archive/$RTL_VERSION.tar.gz
 RTL_UPGRADE_ASC_URL=https://github.com/Ride-The-Lightning/RTL/releases/download/$RTL_VERSION/$RTL_VERSION.tar.gz.asc
 CURRENT=""
@@ -739,12 +767,15 @@ if [ "$CURRENT" != "$RTL_VERSION" ]; then
     sudo echo $RTL_VERSION > $RTL_VERSION_FILE
     cd
 fi
-
+NOT_INSTALL
 
 # Install BTC RPC Explorer
 echo .
+echo "****************************************"
 echo "Installing BTC RPC Explorer..."
+echo "****************************************"
 echo .
+
 BTCRPCEXPLORER_UPGRADE_URL=https://github.com/janoside/btc-rpc-explorer/archive/$BTCRPCEXPLORER_VERSION.tar.gz
 CURRENT=""
 if [ -f $BTCRPCEXPLORER_VERSION_FILE ]; then
@@ -767,8 +798,11 @@ fi
 
 # Upgrade Specter Desktop
 echo .
+echo "****************************************"
 echo "Upgrading Specter Desktop..."
+echo "****************************************"
 echo .
+
 CURRENT=""
 if [ -f $SPECTER_VERSION_FILE ]; then
     CURRENT=$(cat $SPECTER_VERSION_FILE)
@@ -796,8 +830,11 @@ fi
 
 # Upgrade Thunderhub
 echo .
+echo "****************************************"
 echo "Upgrading Thunderhub..."
+echo "****************************************"
 echo .
+
 THUNDERHUB_UPGRADE_URL=https://github.com/apotdevin/thunderhub/archive/$THUNDERHUB_VERSION.tar.gz
 CURRENT=""
 if [ -f $THUNDERHUB_VERSION_FILE ]; then
@@ -830,8 +867,11 @@ fi
 
 # Install LND Connect
 echo .
+echo "****************************************"
 echo "Installing LND Connect..."
+echo "****************************************"
 echo .
+
 LNDCONNECTARCH="lndconnect-linux-amd64"
 LNDCONNECT_UPGRADE_URL=https://github.com/LN-Zap/lndconnect/releases/download/v0.2.0/$LNDCONNECTARCH-$LNDCONNECT_VERSION.tar.gz
 CURRENT=""
@@ -856,8 +896,11 @@ fi
 
 # Install ngrok for debugging
 echo .
+echo "****************************************"
 echo "Installing ngrok for debugging..."
+echo "****************************************"
 echo .
+
 if [ ! -f /usr/bin/ngrok  ]; then
     sudo rm -rf /tmp/ngrok
     sudo mkdir -p /tmp/ngrok
@@ -935,7 +978,6 @@ sudo systemctl enable lnd
 sudo systemctl enable loop
 sudo systemctl enable pool
 sudo systemctl enable lit
-#systemctl enable lnd_unlock # NOT NECESSARY WITH LND 0.13+
 sudo systemctl enable lnd_backup
 sudo systemctl enable lnd_admin_files
 sudo systemctl enable lndconnect
@@ -957,6 +999,7 @@ sudo systemctl enable rotate_logs
 sudo systemctl enable corsproxy_btcrpc
 sudo systemctl enable usb_extras
 sudo systemctl enable ob-watcher
+
 # and now... myNode start
 sudo systemctl enable mynode
 
@@ -975,6 +1018,7 @@ sudo rm -rf /root/.ssh/known_hosts
 sudo rm -rf /etc/resolv.conf
 sudo rm -rf /tmp/*
 sudo rm -rf ~/setup_device.sh
+
 # Remove existing MOTD login info
 sudo rm -rf /etc/motd # Remove simple motd for update-motd.d
 sudo rm -rf /etc/update-motd.d/*
@@ -998,12 +1042,10 @@ fi
 # NOT Expand Root FS
 sudo mkdir -p /var/lib/mynode
 sudo touch /var/lib/mynode/.expanded_rootfs
-
 sudo sync
 
 # Update host info
-sudo hostnamectl set-hostname myNode
-# sudo echo "myNode" > /etc/hostname
+sudo hostnamectl set-hostname myNode # sudo echo "myNode" > /etc/hostname
 
 set +x
 echo ""
@@ -1017,5 +1059,5 @@ echo ""
 echo "You can inspect status myNode with this command:"
 echo "sudo journalctl -f -u mynode"
 echo ""
-
+echo .
 
