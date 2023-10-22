@@ -358,6 +358,17 @@ sudo npm install -g yarn
 
 #########################################################
 
+echo.
+echo.
+echo.
+echo.
+echo "cominezo..."
+ip a
+read a
+echo.
+echo.
+echo.
+echo.
 
 # Install Bitcoin
 echo .
@@ -425,6 +436,17 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     cd
 fi
 
+echo.
+echo.
+echo.
+echo.
+echo "BCORE..."
+ip a
+read a
+echo.
+echo.
+echo.
+echo.
 
 # Install Lightning
 echo .
