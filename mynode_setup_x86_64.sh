@@ -318,26 +318,47 @@ if [ ! -f /tmp/installed_node ]; then
     sudo touch /tmp/installed_node
 fi
 
+# install docker
+# Add Docker's official GPG key:
+apt-get update
+apt-get -y install ca-certificates curl gnupg
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/$LINUX/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the repository to Apt sources:
+echo \
+"deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$LINUX \
+"$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt-get update
+
+apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# install docker-compose
+curl -L https://github.com/docker/compose/releases/download/v2.22.0/docker-compose-linux-x86_64 -o /usr/bin/docker-compose
+chmod +x /usr/bin/docker-compose
+
 # Install docker
-sudo mkdir -p /etc/apt/keyrings
-if [ LINUX == "debian" ]; then
-    sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
-    sudo bash -c "echo \
-      'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-      $(lsb_release -cs) stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null"
-    sudo apt-get update --allow-releaseinfo-change
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true
-elif [ LINUX == "ubuntu" ]; then
-    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
-    sudo bash -c "echo \
-      'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null"
-    sudo apt-get update --allow-releaseinfo-change
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true 
-else
-    sudo apt update --allow-releaseinfo-change
-    sudo apt install -y docker docker-compose
-fi
+#sudo mkdir -p /etc/apt/keyrings
+#if [ LINUX == "debian" ]; then
+    #sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
+    #sudo bash -c "echo \
+    #  'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+    #  $(lsb_release -cs) stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null"
+    #sudo apt-get update --allow-releaseinfo-change
+    #sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true    
+#elif [ LINUX == "ubuntu" ]; then
+    #sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
+    #sudo bash -c "echo \
+    #  'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+    #  $(lsb_release -cs) stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null"
+    #sudo apt-get update --allow-releaseinfo-change
+    #sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true 
+#else
+    #sudo apt update --allow-releaseinfo-change
+    #sudo apt install -y docker docker-compose
+#fi
 # Use systemd for managing docker
 sudo rm -f /etc/init.d/docker
 sudo rm -f /etc/systemd/system/multi-user.target.wants/docker.service
@@ -358,17 +379,6 @@ sudo npm install -g yarn
 
 #########################################################
 
-echo.
-echo.
-echo.
-echo.
-echo "cominezo..."
-ip a
-read a
-echo.
-echo.
-echo.
-echo.
 
 # Install Bitcoin
 echo .
@@ -436,17 +446,7 @@ if [ "$CURRENT" != "$BTC_VERSION" ]; then
     cd
 fi
 
-echo.
-echo.
-echo.
-echo.
-echo "BCORE..."
-ip a
-read a
-echo.
-echo.
-echo.
-echo.
+
 
 # Install Lightning
 echo .
@@ -496,17 +496,7 @@ if [ "$CURRENT" != "$LND_VERSION" ]; then
     cd
 fi
 
-echo.
-echo.
-echo.
-echo.
-echo "1..."
-ip a
-read a
-echo.
-echo.
-echo.
-echo.
+
 
 # Install Loop
 echo .
@@ -554,23 +544,7 @@ if [ "$CURRENT" != "$LOOP_VERSION" ]; then
     cd
 fi
 
-echo.
-echo.
-echo.
-echo.
-echo "2..."
-ip a
-read b
-echo.
-echo.
-echo.
-echo.
-# Install Pool
-echo .
-echo "**************************"
-echo "*** Installing pool... ***"
-echo "**************************"
-echo .
+
 
 POOL_ARCH="pool-linux-amd64"
 POOL_UPGRADE_URL=https://github.com/lightninglabs/pool/releases/download/$POOL_VERSION/$POOL_ARCH-$POOL_VERSION.tar.gz
@@ -605,17 +579,8 @@ if [ "$CURRENT" != "$POOL_VERSION" ]; then
     cd
 fi
 
-echo.
-echo.
-echo.
-echo.
-echo "3..."
-ip a
-read c
-echo.
-echo.
-echo.
-echo.
+
+
 # Install Lightning Terminal
 echo .
 echo "****************************************"
