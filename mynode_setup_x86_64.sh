@@ -643,38 +643,38 @@ sudo chown -R bitcoin:bitcoin /opt/mynode
 
 
 # Install cors proxy (my fork)
-echo .
-echo "****************************************"
-echo "Installing cors proxy by tehelsper..."
-echo "****************************************"
-echo .
+#echo .
+#echo "****************************************"
+#echo "Installing cors proxy by tehelsper..."
+#echo "****************************************"
+#echo .
 
-CORSPROXY_UPGRADE_URL=https://github.com/tehelsper/CORS-Proxy/archive/$CORSPROXY_VERSION.tar.gz
-CURRENT=""
-if [ -f $CORSPROXY_VERSION_FILE ]; then
-    CURRENT=$(cat $CORSPROXY_VERSION_FILE)
-fi
-if [ "$CURRENT" != "$CORSPROXY_VERSION" ]; then
-    cd /opt/mynode
-    sudo rm -rf corsproxy
+#CORSPROXY_UPGRADE_URL=https://github.com/tehelsper/CORS-Proxy/archive/$CORSPROXY_VERSION.tar.gz
+#CURRENT=""
+#if [ -f $CORSPROXY_VERSION_FILE ]; then
+#    CURRENT=$(cat $CORSPROXY_VERSION_FILE)
+#fi
+#if [ "$CURRENT" != "$CORSPROXY_VERSION" ]; then
+#    cd /opt/mynode
+#    sudo rm -rf corsproxy
 
-    sudo rm -f corsproxy.tar.gz
-    sudo wget $CORSPROXY_UPGRADE_URL -O corsproxy.tar.gz
-    sudo tar -xzf corsproxy.tar.gz
-    sudo rm -f corsproxy.tar.gz
-    sudo mv CORS-* corsproxy
+#    sudo rm -f corsproxy.tar.gz
+#    sudo wget $CORSPROXY_UPGRADE_URL -O corsproxy.tar.gz
+#    sudo tar -xzf corsproxy.tar.gz
+#    sudo rm -f corsproxy.tar.gz
+#    sudo mv CORS-* corsproxy
 
-    cd corsproxy
-    sudo npm install
-    cd
+#    cd corsproxy
+#    sudo npm install
+#    cd
     # Mark current version
-    sudo -u bitcoin echo $CORSPROXY_VERSION | sudo -u bitcoin tee $CORSPROXY_VERSION_FILE
-fi
+#   sudo -u bitcoin echo $CORSPROXY_VERSION | sudo -u bitcoin tee $CORSPROXY_VERSION_FILE
+#fi
 
 
 # Install Electrs (just mark version, now included in overlay)
 echo .
-echo "Installing Electrs..."
+echo "Installing Server Electrum --> Electrs..."
 echo .
 
 # Mark current version
