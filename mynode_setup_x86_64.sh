@@ -320,24 +320,24 @@ fi
 
 # install docker
 # Add Docker's official GPG key:
-apt-get update
-apt-get -y install ca-certificates curl gnupg
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/$LINUX/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-chmod a+r /etc/apt/keyrings/docker.gpg
+sudo apt-get update
+sudo apt-get -y install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/$LINUX/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
 # Add the repository to Apt sources:
-echo \
-"deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$LINUX \
-"$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get update
+sudo bash -c "echo \
+    "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$LINUX \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null"
+sudo apt-get update
 
-apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # install docker-compose
-curl -L https://github.com/docker/compose/releases/download/v2.22.0/docker-compose-linux-x86_64 -o /usr/bin/docker-compose
-chmod +x /usr/bin/docker-compose
+sudo curl -L https://github.com/docker/compose/releases/download/v2.22.0/docker-compose-linux-x86_64 -o /usr/bin/docker-compose
+sudo chmod +x /usr/bin/docker-compose
 
 # Install docker
 #sudo mkdir -p /etc/apt/keyrings
@@ -359,6 +359,7 @@ chmod +x /usr/bin/docker-compose
     #sudo apt update --allow-releaseinfo-change
     #sudo apt install -y docker docker-compose
 #fi
+
 # Use systemd for managing docker
 sudo rm -f /etc/init.d/docker
 sudo rm -f /etc/systemd/system/multi-user.target.wants/docker.service
