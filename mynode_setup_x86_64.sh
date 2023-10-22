@@ -473,24 +473,24 @@ if [ "$CURRENT" != "$LND_VERSION" ]; then
     sudo wget $LND_UPGRADE_MANIFEST_GUGGERO_SIG_URL -O manifest_guggero.txt.sig || true
 
     sudo gpg --verify manifest_roasbeef.txt.sig manifest.txt || \
-        sudo gpg --verify manifest_guggero.txt.sig manifest.txt
+    sudo gpg --verify manifest_guggero.txt.sig manifest.txt
 
     sudo tar -xzf lnd-*.tar.gz
     sudo mv $LND_ARCH-$LND_VERSION lnd
     sudo install -m 0755 -o root -g root -t /usr/local/bin lnd/*
+    #sudo ln -s /bin/ip /usr/bin/ip || true
+    
     if [ ! -L /home/bitcoin/.lnd ]; then
         sudo rm -f /home/bitcoin/.lnd
         sudo -u bitcoin ln -s /mnt/hdd/mynode/lnd /home/bitcoin/.lnd
     fi
-    sudo rm -f /usr/bin/ip
-    sudo ln -s /bin/ip /usr/bin/ip || true
 
     # Mark current version
     sudo -u bitcoin echo $LND_VERSION | sudo -u bitcoin tee $LND_VERSION_FILE
 
     # Download bash-completion file for lncli
     sudo wget $LNCLI_COMPLETION_URL
-    sudo sudo cp lncli.bash-completion /etc/bash_completion.d/lncli
+    sudo cp lncli.bash-completion /etc/bash_completion.d/lncli
     
     sudo rm -rf /opt/download/*
     cd
