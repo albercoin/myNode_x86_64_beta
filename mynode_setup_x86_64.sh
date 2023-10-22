@@ -474,6 +474,17 @@ if [ "$CURRENT" != "$LND_VERSION" ]; then
     cd
 fi
 
+echo.
+echo.
+echo.
+echo.
+echo "1..."
+ip a
+read a
+echo.
+echo.
+echo.
+echo.
 
 # Install Loop
 echo .
@@ -521,6 +532,17 @@ if [ "$CURRENT" != "$LOOP_VERSION" ]; then
     cd
 fi
 
+echo.
+echo.
+echo.
+echo.
+echo "2..."
+ip a
+read b
+echo.
+echo.
+echo.
+echo.
 # Install Pool
 echo .
 echo "**************************"
@@ -561,6 +583,17 @@ if [ "$CURRENT" != "$POOL_VERSION" ]; then
     cd
 fi
 
+echo.
+echo.
+echo.
+echo.
+echo "3..."
+ip a
+read c
+echo.
+echo.
+echo.
+echo.
 # Install Lightning Terminal
 echo .
 echo "****************************************"
@@ -643,33 +676,33 @@ sudo chown -R bitcoin:bitcoin /opt/mynode
 
 
 # Install cors proxy (my fork)
-#echo .
-#echo "****************************************"
-#echo "Installing cors proxy by tehelsper..."
-#echo "****************************************"
-#echo .
+echo .
+echo "****************************************"
+echo "Installing cors proxy by tehelsper..."
+echo "****************************************"
+echo .
 
-#CORSPROXY_UPGRADE_URL=https://github.com/tehelsper/CORS-Proxy/archive/$CORSPROXY_VERSION.tar.gz
-#CURRENT=""
-#if [ -f $CORSPROXY_VERSION_FILE ]; then
-#    CURRENT=$(cat $CORSPROXY_VERSION_FILE)
-#fi
-#if [ "$CURRENT" != "$CORSPROXY_VERSION" ]; then
-#    cd /opt/mynode
-#    sudo rm -rf corsproxy
+CORSPROXY_UPGRADE_URL=https://github.com/tehelsper/CORS-Proxy/archive/$CORSPROXY_VERSION.tar.gz
+CURRENT=""
+if [ -f $CORSPROXY_VERSION_FILE ]; then
+    CURRENT=$(cat $CORSPROXY_VERSION_FILE)
+fi
+if [ "$CURRENT" != "$CORSPROXY_VERSION" ]; then
+    cd /opt/mynode
+    sudo rm -rf corsproxy
 
-#    sudo rm -f corsproxy.tar.gz
-#    sudo wget $CORSPROXY_UPGRADE_URL -O corsproxy.tar.gz
-#    sudo tar -xzf corsproxy.tar.gz
-#    sudo rm -f corsproxy.tar.gz
-#    sudo mv CORS-* corsproxy
+    sudo rm -f corsproxy.tar.gz
+    sudo wget $CORSPROXY_UPGRADE_URL -O corsproxy.tar.gz
+    sudo tar -xzf corsproxy.tar.gz
+    sudo rm -f corsproxy.tar.gz
+    sudo mv CORS-* corsproxy
 
-#    cd corsproxy
-#    sudo npm install
-#    cd
+    cd corsproxy
+    sudo npm install
+    cd
     # Mark current version
-#   sudo -u bitcoin echo $CORSPROXY_VERSION | sudo -u bitcoin tee $CORSPROXY_VERSION_FILE
-#fi
+   sudo -u bitcoin echo $CORSPROXY_VERSION | sudo -u bitcoin tee $CORSPROXY_VERSION_FILE
+fi
 
 
 # Install Electrs (just mark version, now included in overlay)
