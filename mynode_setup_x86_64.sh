@@ -1075,6 +1075,7 @@ sudo touch /var/lib/mynode/.expanded_rootfs
 sudo sync
 
 # Update host info
+sudo sed -i "s/$HOSTNAME/myNode/" /etc/hosts
 sudo hostnamectl set-hostname myNode # sudo echo "myNode" > /etc/hostname
 
 # Remove default debian stuff
