@@ -2,6 +2,7 @@
 install script of mynode for Intel/AMD system
 This script has been tested and working fine in:
 - Debian 11.x
+- Debian 12.x
 - Ubuntu 22.04.x LTS
 - Pop!_OS 22.04 LTS
 
