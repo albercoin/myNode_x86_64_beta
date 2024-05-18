@@ -568,6 +568,7 @@ if [ -f /boot/efi/EFI/debian/grubx64.efi ]; then
 fi
 
 # Update host info
+sudo sed -i "s/$HOSTNAME/myNode/" /etc/hosts
 sudo hostnamectl set-hostname myNode # sudo echo "myNode" > /etc/hostname
 
 set +x
