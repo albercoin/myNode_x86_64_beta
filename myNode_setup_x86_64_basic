@@ -5,9 +5,9 @@
 ### Run with "sudo"
 ###
 
-echo "*****************************"
+echo "***********************************"
 echo "*** myNode x86_64 basic install ***"
-echo "*****************************"
+echo "***********************************"
 
 sleep 1
 sudo -v
@@ -114,9 +114,7 @@ if [ $IS_64_BIT = 1 ]; then
     sudo grep -qxF "deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || sudo bash -c "echo 'deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main' >> /etc/apt/sources.list"
     sudo grep -qxF "deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main" /etc/apt/sources.list  || sudo bash -c "echo 'deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main' >> /etc/apt/sources.list"
 fi
-#if [ "$DEBIAN_VERSION" = "buster" ]; then
-#    sudo grep -qxF "deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main" /etc/apt/sources.list  || sudo bash -c "echo 'deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main' >> /etc/apt/sources.list"
-#fi
+
 
 # torrc.d dir
 sudo mkdir -p /etc/torrc.d
@@ -191,10 +189,8 @@ sudo apt-get -y install hdparm iotop nut obfs4proxy libpq-dev socat btrfs-progs 
 ##################################
 
 # Install packages dependent on Debian release
-if [ "$DEBIAN_VERSION" == "bullseye" ] || [ "$DEBIAN_VERSION" == "jammy" ]; then
+if [ "$DEBIAN_VERSION" == "bullseye" ] || [ "$DEBIAN_VERSION" == "bookworm" ] || [ "$DEBIAN_VERSION" == "jammy" ]; then
     sudo apt-get -y install wireguard
-elif [ "$DEBIAN_VERSION" == "buster" ]; then
-    $TORIFY sudo apt-get -y -t buster-backports install wireguard
 else
     echo .
     echo "========================================="
@@ -271,32 +267,35 @@ sudo pip3 install -r $TMP_INSTALL_PATH/usr/share/mynode/mynode_pip3_requirements
 
 
 # Install node
-if [ ! -f /tmp/installed_node ]; then
-    sudo curl -sL https://deb.nodesource.com/setup_$NODE_JS_VERSION | sudo bash -
-    sudo apt-get install -y nodejs
-    sudo touch /tmp/installed_node
-fi
+sudo curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo bash - &&\
+sudo apt-get install -y nodejs
 
-# Install docker
-sudo mkdir -p /etc/apt/keyrings
-if [ LINUX == "debian" ]; then
-    sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
-    sudo bash -c "echo \
-      'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-      $(lsb_release -cs) stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null"
-    sudo apt-get update --allow-releaseinfo-change
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true
-elif [ LINUX == "ubuntu" ]; then
-    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
-    sudo bash -c "echo \
-      'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable' | tee /etc/apt/sources.list.d/docker.list > /dev/null"
-    sudo apt-get update --allow-releaseinfo-change
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin || true 
-else
-    sudo apt update --allow-releaseinfo-change
-    sudo apt install -y docker docker-compose
-fi
+# Install node packages
+sudo npm install -g pug-cli browserify uglify-js babel-cli
+sudo npm install -g npm
+sudo npm install -g yarn
+
+# install docker
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get -y install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/$LINUX/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add the repository to Apt sources:
+sudo bash -c "echo \
+    'deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$LINUX \
+    "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable' | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null"
+sudo apt-get update
+
+sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# install latest docker-compose
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64 -o /usr/bin/docker-compose    
+sudo chmod +x /usr/bin/docker-compose
+
 # Use systemd for managing docker
 sudo rm -f /etc/init.d/docker
 sudo rm -f /etc/systemd/system/multi-user.target.wants/docker.service
@@ -306,14 +305,6 @@ sudo groupadd docker || true
 sudo usermod -aG docker admin
 sudo usermod -aG docker bitcoin
 sudo usermod -aG docker root
-
-##################################
-
-# Install node packages
-sudo npm install -g pug-cli browserify uglify-js babel-cli
-sudo npm install -g npm@$NODE_NPM_VERSION
-sudo npm install -g yarn
-
 
 #########################################################
 
@@ -575,11 +566,6 @@ if [ -f /boot/efi/EFI/debian/grubx64.efi ]; then
     sudo mkdir -p /boot/efi/EFI/BOOT
     sudo cp -f /boot/efi/EFI/debian/grubx64.efi /boot/efi/EFI/BOOT/bootx64.efi
 fi
-
-# NOT Expand Root FS
-sudo mkdir -p /var/lib/mynode
-sudo touch /var/lib/mynode/.expanded_rootfs
-sudo sync
 
 # Update host info
 sudo hostnamectl set-hostname myNode # sudo echo "myNode" > /etc/hostname
