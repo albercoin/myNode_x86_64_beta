@@ -114,9 +114,6 @@ if [ $IS_64_BIT = 1 ]; then
     sudo grep -qxF "deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main" /etc/apt/sources.list  || sudo bash -c "echo 'deb-src https://deb.torproject.org/torproject.org ${DEBIAN_VERSION} main' >> /etc/apt/sources.list"
     sudo grep -qxF "deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main" /etc/apt/sources.list  || sudo bash -c "echo 'deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main' >> /etc/apt/sources.list"
 fi
-#if [ "$DEBIAN_VERSION" = "buster" ]; then
-#    sudo grep -qxF "deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main" /etc/apt/sources.list  || sudo bash -c "echo 'deb http://deb.debian.org/debian ${DEBIAN_VERSION}-backports main' >> /etc/apt/sources.list"
-#fi
 
 # torrc.d dir
 sudo mkdir -p /etc/torrc.d
@@ -182,7 +179,7 @@ sudo apt-get -y install pv sysstat network-manager rsync parted unzip pkg-config
 sudo apt-get -y install libfreetype6-dev libpng-dev libatlas-base-dev libgmp-dev libltdl-dev
 sudo apt-get -y install libffi-dev libssl-dev python3-bottle automake libtool libltdl7
 sudo apt-get -y install apt-transport-https ca-certificates
-sudo apt-get -y install openjdk-11-jre libevent-dev ncurses-dev
+sudo apt-get -y install openjdk-17-jre libevent-dev ncurses-dev
 sudo apt-get -y install zlib1g-dev libudev-dev libusb-1.0-0-dev python3-venv gunicorn
 sudo apt-get -y install sqlite3 libsqlite3-dev torsocks python3-requests libsystemd-dev
 sudo apt-get -y install libjpeg-dev zlib1g-dev psmisc hexyl libbz2-dev liblzma-dev netcat-openbsd
@@ -191,10 +188,8 @@ sudo apt-get -y install hdparm iotop nut obfs4proxy libpq-dev socat btrfs-progs 
 ##################################
 
 # Install packages dependent on Debian release
-if [ "$DEBIAN_VERSION" == "bullseye" ] || [ "$DEBIAN_VERSION" == "jammy" ]; then
+if [ "$DEBIAN_VERSION" == "bullseye" ] || [ "$DEBIAN_VERSION" == "bookworm" ] || [ "$DEBIAN_VERSION" == "jammy" ]; then
     sudo apt -y install wireguard
-elif [ "$DEBIAN_VERSION" == "buster" ]; then
-    $TORIFY sudo apt -y -t buster-backports install wireguard
 else
     echo .
     echo "========================================="
@@ -209,11 +204,6 @@ if [ $IS_X86 = 1 ] && [ -z $DESKTOP_SESSION ]; then
     sudo apt -y install xorg chromium openbox lightdm
 fi
 
-# Install device specific packages
-#if [ $IS_X86 = 1 ]; then
-#    sudo apt -y install cloud-init
-#    sudo apt -y install intel-microcode || true
-#fi
 
 # Make sure some software is removed
 sudo apt -y purge ntp # (conflicts with systemd-timedatectl)
@@ -264,24 +254,6 @@ echo "export GOBIN=/usr/local/go/bin; PATH=\$PATH:/usr/local/go/bin" > /etc/prof
 grep -qxF '. /etc/profile.d/go.sh' /root/.bashrc || echo '. /etc/profile.d/go.sh' >> /root/.bashrc
 
 
-# Install Rust (only needed on 32-bit RPi for building some python wheels)
-if [ ! -f $HOME/.cargo/env ]; then
-    wget https://sh.rustup.rs -O /tmp/setup_rust.sh
-    /bin/bash /tmp/setup_rust.sh -y --default-toolchain none
-    sync
-fi
-if [ -f $HOME/.cargo/env ]; then
-    # Remove old toolchains
-    source $HOME/.cargo/env
-    TOOLCHAINS=$(rustup toolchain list)
-    for toolchain in $TOOLCHAINS; do
-        if [[ "$toolchain" == *"linux"* ]] && [[ "$toolchain" != *"${RUST_VERSION}"* ]]; then
-            rustup toolchain remove $toolchain || true
-        fi
-    done    
-fi
-
-
 
 # Install Python3 (latest)
 CURRENT_PYTHON3_VERSION=$(python3 --version)
@@ -309,14 +281,16 @@ sudo pip3 install --upgrade pip wheel setuptools
 sudo pip3 install -r $TMP_INSTALL_PATH/usr/share/mynode/mynode_pip3_requirements.txt --no-cache-dir || \
     sudo pip3 install -r $TMP_INSTALL_PATH/usr/share/mynode/mynode_pip3_requirements.txt --no-cache-dir --use-deprecated=html5lib
 
-
-
 # Install node
-if [ ! -f /tmp/installed_node ]; then
-    sudo curl -sL https://deb.nodesource.com/setup_$NODE_JS_VERSION | sudo bash -
-    sudo apt-get install -y nodejs
-    sudo touch /tmp/installed_node
-fi
+sudo curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo bash - &&\
+sudo apt-get install -y nodejs
+
+# OLD Install node
+#if [ ! -f /tmp/installed_node ]; then
+#    sudo curl -sL https://deb.nodesource.com/setup_$NODE_JS_VERSION | sudo bash -
+#    sudo apt-get install -y nodejs
+#    sudo touch /tmp/installed_node
+#fi
 
 # install docker
 # Add Docker's official GPG key:
@@ -335,11 +309,11 @@ sudo apt-get update
 
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# install docker-compose
-sudo curl -L https://github.com/docker/compose/releases/download/v2.22.0/docker-compose-linux-x86_64 -o /usr/bin/docker-compose
+# install latest docker-compose
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64 -o /usr/bin/docker-compose    
 sudo chmod +x /usr/bin/docker-compose
 
-# Install docker
+# OLD Install docker
 #sudo mkdir -p /etc/apt/keyrings
 #if [ LINUX == "debian" ]; then
     #sudo curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
